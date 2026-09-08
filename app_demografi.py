@@ -35,7 +35,7 @@ PALET = {
 }
 
 LOGO_SVG = """
-<svg width="64" height="64" viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg">
+<svg width="96" height="96" viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg">
   <path d="M340,240 C300,190 260,160 260,120 C260,75 296,40 340,40 C384,40 420,75 420,120 C420,160 380,190 340,240 Z"
         fill="#0F6E56" stroke="#085041" stroke-width="2"/>
   <rect x="300" y="145" width="18" height="30" rx="3" fill="#EF9F27" stroke="#BA7517" stroke-width="1"/>
@@ -51,6 +51,16 @@ st.markdown(f"""
 
 html, body, [class*="css"] {{
     font-family: 'Inter', sans-serif;
+}}
+.block-container {{
+    padding-top: 2.2rem;
+    max-width: 1150px;
+}}
+[data-testid="stMetric"] {{
+    background: #FAFAF7;
+    border: 1px solid #E7E5DD;
+    border-radius: 12px;
+    padding: 14px 16px 10px 16px;
 }}
 h1, h2, h3, .stTabs [data-baseweb="tab"] p {{
     font-family: 'Plus Jakarta Sans', sans-serif !important;
@@ -70,15 +80,20 @@ h1, h2, h3, .stTabs [data-baseweb="tab"] p {{
 </style>
 """, unsafe_allow_html=True)
 
-col_logo, col_judul = st.columns([1, 9])
-with col_logo:
-    st.markdown(LOGO_SVG, unsafe_allow_html=True)
-with col_judul:
-    st.markdown(
-        "<h1 style='margin-bottom:0;padding-top:8px;'>DEMUDA Purworejo</h1>"
-        "<p style='margin-top:0;color:#5F5E5A;font-size:15px;'>Peta Potensi Demografi Pemuda Kabupaten Purworejo</p>",
-        unsafe_allow_html=True
-    )
+st.markdown(
+    f"""
+    <div style='display:flex;align-items:center;gap:18px;margin-bottom:4px;'>
+        {LOGO_SVG}
+        <div>
+            <h1 style='margin:0;line-height:1.1;'>DEMUDA Purworejo</h1>
+            <p style='margin:2px 0 0 0;color:{PALET["teks_sekunder"]};font-size:15px;'>
+                Peta Potensi Demografi Pemuda Kabupaten Purworejo
+            </p>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # ==========================================================
 # 📊 DATA -- HASIL ESTIMASI DARI DUA SUMBER RESMI BPS
