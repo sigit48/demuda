@@ -81,17 +81,13 @@ h1, h2, h3, .stTabs [data-baseweb="tab"] p {{
 """, unsafe_allow_html=True)
 
 st.markdown(
-    f"""
-    <div style='display:flex;align-items:center;gap:18px;margin-bottom:4px;'>
-        {LOGO_SVG}
-        <div>
-            <h1 style='margin:0;line-height:1.1;'>DEMUDA Purworejo</h1>
-            <p style='margin:2px 0 0 0;color:{PALET["teks_sekunder"]};font-size:15px;'>
-                Peta Potensi Demografi Pemuda Kabupaten Purworejo
-            </p>
-        </div>
-    </div>
-    """,
+    f"""<div style='display:flex;align-items:center;gap:18px;margin-bottom:4px;'>
+{LOGO_SVG}
+<div>
+<h1 style='margin:0;line-height:1.1;'>DEMUDA Purworejo</h1>
+<p style='margin:2px 0 0 0;color:{PALET["teks_sekunder"]};font-size:15px;'>Peta Potensi Demografi Pemuda Kabupaten Purworejo</p>
+</div>
+</div>""",
     unsafe_allow_html=True
 )
 
