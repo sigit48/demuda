@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import io
+import textwrap
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors as pdf_colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
@@ -41,7 +42,7 @@ PALET = {
 }
 
 LOGO_SVG = """
-<svg width="96" height="96" viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg">
+<svg width="140" height="140" viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg">
   <path d="M340,240 C300,190 260,160 260,120 C260,75 296,40 340,40 C384,40 420,75 420,120 C420,160 380,190 340,240 Z"
         fill="#0F6E56" stroke="#085041" stroke-width="2"/>
   <rect x="300" y="145" width="18" height="30" rx="3" fill="#EF9F27" stroke="#BA7517" stroke-width="1"/>
@@ -217,7 +218,7 @@ st.caption(
 )
 
 with st.expander("ℹ️ Metodologi & Sumber Data"):
-    st.markdown("""
+    st.markdown(textwrap.dedent("""
     Dashboard ini menggabungkan **dua tabel resmi BPS** yang aslinya terpisah:
 
     1. **Struktur umur penduduk** -- BPS Kab. Purworejo, *"Jumlah Penduduk Menurut
@@ -244,10 +245,10 @@ with st.expander("ℹ️ Metodologi & Sumber Data"):
 
     ⚠️ Angka per kecamatan pada dashboard ini adalah **estimasi berbasis data
     resmi**, bukan hasil sensus/survei langsung per kecamatan.
-    """)
+    """))
 
 with st.expander("🇮🇩 Konteks: Bonus Demografi & Generasi Emas 2045"):
-    st.markdown("""
+    st.markdown(textwrap.dedent("""
     **Bonus Demografi** adalah kondisi ketika jumlah penduduk usia produktif
     (15-64 tahun) jauh lebih besar dibanding usia non-produktif (anak &
     lansia), sehingga rasio ketergantungan rendah -- membuka peluang besar
@@ -268,7 +269,7 @@ with st.expander("🇮🇩 Konteks: Bonus Demografi & Generasi Emas 2045"):
     **mengidentifikasi kecamatan mana yang perlu diprioritaskan** dalam
     penyiapan pemudanya, supaya bonus demografi ini benar-benar termanfaatkan
     di tingkat kabupaten, sejalan dengan agenda nasional Generasi Emas 2045.
-    """)
+    """))
 
 
 
@@ -282,6 +283,17 @@ def format_id(n):
     tanda baca lain di kalimat -- dipakai per-angka, bukan replace massal
     di seluruh string (itu bug yang pernah bikin koma kalimat ikut berubah)."""
     return f"{n:,.0f}".replace(",", ".")
+
+
+def markdown_bold_ke_html(teks):
+    """⚠️ FIX BUG: markdown **tebal** TIDAK otomatis dirender jadi bold kalau
+    ditaruh di dalam blok HTML mentah (st.markdown unsafe_allow_html) --
+    parser Markdown memperlakukan konten di dalam tag HTML sebagai teks
+    apa adanya, tidak diproses lagi jadi HTML. Fungsi ini mengonversi
+    **teks** secara eksplisit jadi <b>teks</b> SEBELUM ditaruh di dalam HTML,
+    supaya tetap tampil tebal dengan benar."""
+    import re
+    return re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", teks)
 
 total_penduduk = int(df["total_penduduk"].sum())
 total_produktif = int(df["penduduk_15_64"].sum())
@@ -315,7 +327,7 @@ ringkasan_teks = (
 st.markdown(
     f"""<div style='background:#E1F5EE;border:1px solid #0F6E56;border-radius:12px;padding:18px 20px;margin-bottom:8px;'>
 <p style='margin:0 0 4px 0;font-weight:600;color:#04342C;font-family:"Plus Jakarta Sans",sans-serif;'>🌟 Ringkasan Eksekutif</p>
-<p style='margin:0;color:#04342C;line-height:1.6;'>{ringkasan_teks}</p>
+<p style='margin:0;color:#04342C;line-height:1.6;'>{markdown_bold_ke_html(ringkasan_teks)}</p>
 </div>""",
     unsafe_allow_html=True
 )
@@ -389,7 +401,7 @@ def buat_pdf_laporan():
         ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
     ]))
     elemen += [t, Spacer(1, 14), Paragraph("Ringkasan", subjudul_style),
-               Paragraph(ringkasan_teks.replace("**", ""), body_style), Spacer(1, 14),
+               Paragraph(markdown_bold_ke_html(ringkasan_teks), body_style), Spacer(1, 14),
                Paragraph("Ranking Proporsi Pemuda per Kecamatan", subjudul_style)]
 
     header = ["Kecamatan", "Proporsi Pemuda (%)", "Rasio Ketergantungan (%)"]
@@ -631,72 +643,79 @@ with tab4:
         default_b = "Kaligesing" if "Kaligesing" in daftar_kecamatan else daftar_kecamatan[-1]
         kec_b = st.selectbox("Kecamatan kedua:", daftar_kecamatan, index=daftar_kecamatan.index(default_b))
 
-    baris_a = df[df["kecamatan"] == kec_a].iloc[0]
-    baris_b = df[df["kecamatan"] == kec_b].iloc[0]
-
-    c1, c2 = st.columns(2)
-    with c1:
-        st.markdown(f"#### {kec_a}")
-        st.metric("Total Penduduk", format_id(int(baris_a["total_penduduk"])))
-        st.metric("Proporsi Pemuda", f"{baris_a['proporsi_pemuda_dari_total']}%")
-        st.metric("Rasio Ketergantungan", f"{baris_a['rasio_ketergantungan']}%")
-    with c2:
-        st.markdown(f"#### {kec_b}")
-        st.metric("Total Penduduk", format_id(int(baris_b["total_penduduk"])))
-        st.metric("Proporsi Pemuda", f"{baris_b['proporsi_pemuda_dari_total']}%")
-        st.metric("Rasio Ketergantungan", f"{baris_b['rasio_ketergantungan']}%")
-
-    st.markdown("---")
-    st.subheader("Radar Perbandingan (skala relatif terhadap kabupaten)")
-
-    # Normalisasi tiap metrik terhadap rentang min-maks seluruh kecamatan,
-    # supaya bentuk radar tetap terbaca meski satuan tiap metrik beda jauh.
-    metrik_radar = ["total_penduduk", "kepadatan", "proporsi_pemuda_dari_total", "rasio_ketergantungan"]
-    label_radar = ["Total Penduduk", "Kepadatan", "Proporsi Pemuda", "Rasio Ketergantungan"]
-    min_vals = df[metrik_radar].min()
-    max_vals = df[metrik_radar].max()
-
-    def skala_radar(baris):
-        return [
-            ((baris[m] - min_vals[m]) / (max_vals[m] - min_vals[m]) * 100) if max_vals[m] > min_vals[m] else 50
-            for m in metrik_radar
-        ]
-
-    fig_radar = go.Figure()
-    fig_radar.add_trace(go.Scatterpolar(
-        r=skala_radar(baris_a) + [skala_radar(baris_a)[0]],
-        theta=label_radar + [label_radar[0]],
-        fill="toself", name=kec_a, line_color=PALET["teal"]
-    ))
-    fig_radar.add_trace(go.Scatterpolar(
-        r=skala_radar(baris_b) + [skala_radar(baris_b)[0]],
-        theta=label_radar + [label_radar[0]],
-        fill="toself", name=kec_b, line_color=PALET["amber"]
-    ))
-    fig_radar.update_layout(
-        polar=dict(radialaxis=dict(visible=True, range=[0, 100], showticklabels=False)),
-        height=450, showlegend=True
-    )
-    st.plotly_chart(fig_radar, width='stretch')
-    st.caption(
-        "Nilai pada radar dinormalisasi 0-100% relatif terhadap kecamatan tertinggi/terendah "
-        "se-kabupaten untuk tiap metrik -- bukan skala absolut, tapi untuk membandingkan posisi relatif."
-    )
-
-    # --- Insight otomatis perbandingan ---
-    selisih_pemuda = baris_a["proporsi_pemuda_dari_total"] - baris_b["proporsi_pemuda_dari_total"]
-    if abs(selisih_pemuda) < 0.5:
-        st.info(f"📌 Proporsi pemuda **{kec_a}** dan **{kec_b}** relatif setara (selisih {abs(selisih_pemuda):.1f}%).")
-    elif selisih_pemuda > 0:
-        st.info(
-            f"📌 **{kec_a}** memiliki proporsi pemuda {abs(selisih_pemuda):.1f}% lebih tinggi dibanding "
-            f"**{kec_b}** -- bisa jadi acuan praktik baik yang mungkin relevan diterapkan di {kec_b}."
-        )
+    if kec_a == kec_b:
+        # ⚠️ FIX BUG: tanpa pengecekan ini, membandingkan kecamatan dengan
+        # dirinya sendiri menghasilkan kalimat aneh ("X dan X relatif setara")
+        # dan radar chart dengan dua bentuk numpuk sempurna -- bingungkan
+        # pengguna. Hentikan lebih awal dengan pesan yang jelas.
+        st.warning("⚠️ Pilih dua kecamatan yang berbeda untuk membandingkan.")
     else:
-        st.info(
-            f"📌 **{kec_b}** memiliki proporsi pemuda {abs(selisih_pemuda):.1f}% lebih tinggi dibanding "
-            f"**{kec_a}** -- bisa jadi acuan praktik baik yang mungkin relevan diterapkan di {kec_a}."
+        baris_a = df[df["kecamatan"] == kec_a].iloc[0]
+        baris_b = df[df["kecamatan"] == kec_b].iloc[0]
+
+        c1, c2 = st.columns(2)
+        with c1:
+            st.markdown(f"#### {kec_a}")
+            st.metric("Total Penduduk", format_id(int(baris_a["total_penduduk"])))
+            st.metric("Proporsi Pemuda", f"{baris_a['proporsi_pemuda_dari_total']}%")
+            st.metric("Rasio Ketergantungan", f"{baris_a['rasio_ketergantungan']}%")
+        with c2:
+            st.markdown(f"#### {kec_b}")
+            st.metric("Total Penduduk", format_id(int(baris_b["total_penduduk"])))
+            st.metric("Proporsi Pemuda", f"{baris_b['proporsi_pemuda_dari_total']}%")
+            st.metric("Rasio Ketergantungan", f"{baris_b['rasio_ketergantungan']}%")
+
+        st.markdown("---")
+        st.subheader("Radar Perbandingan (skala relatif terhadap kabupaten)")
+
+        # Normalisasi tiap metrik terhadap rentang min-maks seluruh kecamatan,
+        # supaya bentuk radar tetap terbaca meski satuan tiap metrik beda jauh.
+        metrik_radar = ["total_penduduk", "kepadatan", "proporsi_pemuda_dari_total", "rasio_ketergantungan"]
+        label_radar = ["Total Penduduk", "Kepadatan", "Proporsi Pemuda", "Rasio Ketergantungan"]
+        min_vals = df[metrik_radar].min()
+        max_vals = df[metrik_radar].max()
+
+        def skala_radar(baris):
+            return [
+                ((baris[m] - min_vals[m]) / (max_vals[m] - min_vals[m]) * 100) if max_vals[m] > min_vals[m] else 50
+                for m in metrik_radar
+            ]
+
+        fig_radar = go.Figure()
+        fig_radar.add_trace(go.Scatterpolar(
+            r=skala_radar(baris_a) + [skala_radar(baris_a)[0]],
+            theta=label_radar + [label_radar[0]],
+            fill="toself", name=kec_a, line_color=PALET["teal"]
+        ))
+        fig_radar.add_trace(go.Scatterpolar(
+            r=skala_radar(baris_b) + [skala_radar(baris_b)[0]],
+            theta=label_radar + [label_radar[0]],
+            fill="toself", name=kec_b, line_color=PALET["amber"]
+        ))
+        fig_radar.update_layout(
+            polar=dict(radialaxis=dict(visible=True, range=[0, 100], showticklabels=False)),
+            height=450, showlegend=True
         )
+        st.plotly_chart(fig_radar, width='stretch')
+        st.caption(
+            "Nilai pada radar dinormalisasi 0-100% relatif terhadap kecamatan tertinggi/terendah "
+            "se-kabupaten untuk tiap metrik -- bukan skala absolut, tapi untuk membandingkan posisi relatif."
+        )
+
+        # --- Insight otomatis perbandingan ---
+        selisih_pemuda = baris_a["proporsi_pemuda_dari_total"] - baris_b["proporsi_pemuda_dari_total"]
+        if abs(selisih_pemuda) < 0.5:
+            st.info(f"📌 Proporsi pemuda **{kec_a}** dan **{kec_b}** relatif setara (selisih {abs(selisih_pemuda):.1f}%).")
+        elif selisih_pemuda > 0:
+            st.info(
+                f"📌 **{kec_a}** memiliki proporsi pemuda {abs(selisih_pemuda):.1f}% lebih tinggi dibanding "
+                f"**{kec_b}** -- bisa jadi acuan praktik baik yang mungkin relevan diterapkan di {kec_b}."
+            )
+        else:
+            st.info(
+                f"📌 **{kec_b}** memiliki proporsi pemuda {abs(selisih_pemuda):.1f}% lebih tinggi dibanding "
+                f"**{kec_a}** -- bisa jadi acuan praktik baik yang mungkin relevan diterapkan di {kec_a}."
+            )
 
 # ==========================================================
 # FOOTER
