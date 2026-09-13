@@ -247,7 +247,7 @@ with st.expander("ℹ️ Metodologi & Sumber Data"):
     resmi**, bukan hasil sensus/survei langsung per kecamatan.
     """))
 
-with st.expander("🇮🇩 Konteks: Bonus Demografi & Generasi Emas 2045"):
+with st.expander("Konteks: Bonus Demografi & Generasi Emas 2045"):
     st.markdown(textwrap.dedent("""
     **Bonus Demografi** adalah kondisi ketika jumlah penduduk usia produktif
     (15-64 tahun) jauh lebih besar dibanding usia non-produktif (anak &
