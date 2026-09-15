@@ -19,19 +19,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# ==========================================================
-# 🎨 IDENTITAS VISUAL -- palet warna, tipografi, & logo
-# ==========================================================
-# Palet warna:
-#   - Teal  #0F6E56 (utama, kesan resmi/data terpercaya) -- dipakai untuk
-#     header, ikon peta, dan elemen struktural.
-#   - Amber #EF9F27 / #BA7517 (aksen, energi & semangat muda) -- dipakai
-#     untuk elemen data/grafik yang berkaitan dengan pemuda.
-#   - Abu gelap #2C2C2A (teks utama), abu muda #5F5E5A (teks sekunder).
-# Tipografi: "Plus Jakarta Sans" untuk judul (modern, geometris, cocok
-# nuansa data/teknologi), "Inter" untuk teks isi (sangat mudah dibaca).
-# Kedua font gratis dari Google Fonts.
-
 PALET = {
     "teal": "#0F6E56",
     "teal_muda": "#5DCAA5",
@@ -428,11 +415,12 @@ st.download_button(
     mime="application/pdf",
 )
 
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📊 Ringkasan Kabupaten",
     "🗺️ Peta & Profil Kecamatan",
     "🧑‍🤝‍🧑 Fokus Pemuda",
-    "⚖️ Bandingkan Kecamatan"
+    "⚖️ Bandingkan Kecamatan",
+    "🔮 Simulasi Proyeksi"
 ])
 # ==========================================================
 # TAB 1 -- RINGKASAN KABUPATEN
@@ -716,6 +704,159 @@ with tab4:
                 f"📌 **{kec_b}** memiliki proporsi pemuda {abs(selisih_pemuda):.1f}% lebih tinggi dibanding "
                 f"**{kec_a}** -- bisa jadi acuan praktik baik yang mungkin relevan diterapkan di {kec_a}."
             )
+
+# ==========================================================
+# TAB 5 -- WHATIF
+# ==========================================================
+with tab5:
+    st.set_page_config(page_title="What-If Demografi", page_icon="🧪", layout="wide")
+    
+    PALET = {"teal": "#0F6E56", "amber": "#EF9F27"}
+
+    # --- Data sama persis dengan app_demografi.py, supaya hasil uji representatif ---
+    DATA_DASAR_KECAMATAN = [
+        ("Bagelen",      30965,  63.44),
+        ("Banyuurip",    44221,  47.78),
+        ("Bayan",        53220,  44.66),
+        ("Bener",        58913, 102.44),
+        ("Bruno",        55454, 105.68),
+        ("Butuh",        42998,  47.21),
+        ("Gebang",       44525,  70.51),
+        ("Grabag",       51175,  67.80),
+        ("Kaligesing",   32564,  78.33),
+        ("Kemiri",       61008, 103.15),
+        ("Kutoarjo",     63172,  39.20),
+        ("Loano",        39201,  53.51),
+        ("Ngombol",      36202,  59.33),
+        ("Pituruh",      53095,  89.01),
+        ("Purwodadi",    42725,  56.15),
+        ("Purworejo",    85595,  53.25),
+    ]
+
+    P_PRODUKTIF_KAB = 0.674702
+    P_LANSIA_KAB = 0.123679
+    PEMUDA_DARI_PRODUKTIF = 0.216137 / 0.674702
+
+
+    @st.cache_data
+    def load_data():
+        df = pd.DataFrame(DATA_DASAR_KECAMATAN, columns=["kecamatan", "total_penduduk", "luas_km2"])
+        df["kepadatan"] = df["total_penduduk"] / df["luas_km2"]
+        kepadatan_rata2_kab = df["total_penduduk"].sum() / df["luas_km2"].sum()
+        z = (df["kepadatan"] / kepadatan_rata2_kab) - 1
+        z_clipped = z.clip(-0.4, 0.4)
+        produktif_share = (P_PRODUKTIF_KAB * (1 + 0.12 * z_clipped)).clip(0.60, 0.75)
+        lansia_share = (P_LANSIA_KAB * (1 - 0.15 * z_clipped)).clip(0.08, 0.18)
+        pemuda_share = produktif_share * PEMUDA_DARI_PRODUKTIF
+        df["pemuda_16_30"] = (df["total_penduduk"] * pemuda_share).round().astype(int)
+        return df
+    
+    
+    df = load_data()
+
+    st.title("🧪 Uji Coba: Simulasi Proyeksi Pemuda")
+    
+    # ==========================================================
+    # FITUR WHAT-IF
+    # ==========================================================
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        kecamatan_pilihan = st.selectbox(
+            "Pilih kecamatan:",
+            ["Se-Kabupaten (semua kecamatan)"] + sorted(df["kecamatan"].tolist())
+        )
+    
+    with col2:
+        tingkat_pertumbuhan = st.slider(
+            "Asumsi pertumbuhan penduduk/tahun (%):",
+            min_value=-2.0, max_value=5.0, value=1.2, step=0.1
+        )
+    
+    with col3:
+        jumlah_tahun = st.slider("Proyeksi berapa tahun ke depan?", min_value=1, max_value=25, value=10)
+    
+    # --- Ambil populasi awal sesuai pilihan ---
+    if kecamatan_pilihan == "Se-Kabupaten (semua kecamatan)":
+        populasi_awal = df["total_penduduk"].sum()
+        pemuda_awal = df["pemuda_16_30"].sum()
+    else:
+        baris = df[df["kecamatan"] == kecamatan_pilihan].iloc[0]
+        populasi_awal = baris["total_penduduk"]
+        pemuda_awal = baris["pemuda_16_30"]
+    
+    # --- Rumus pertumbuhan majemuk ---
+    tahun_list = list(range(0, jumlah_tahun + 1))
+    proyeksi_list = []
+    for tahun in tahun_list:
+        faktor = (1 + tingkat_pertumbuhan / 100) ** tahun
+        proyeksi_list.append({
+            "tahun": tahun,
+            "populasi": populasi_awal * faktor,
+            "pemuda": pemuda_awal * faktor,
+        })
+    df_proyeksi = pd.DataFrame(proyeksi_list)
+    
+    # --- Visualisasi ---
+    fig = px.line(
+        df_proyeksi, x="tahun", y=["populasi", "pemuda"],
+        labels={"value": "Jumlah penduduk", "tahun": "Tahun ke depan", "variable": "Kategori"},
+        color_discrete_sequence=[PALET["teal"], PALET["amber"]],
+        markers=True,
+    )
+    fig.update_layout(height=450)
+    st.plotly_chart(fig, width='stretch')
+    
+    # --- Insight otomatis (peka terhadap besaran perubahan) ---
+    def format_id(n):
+        return f"{n:,.0f}".replace(",", ".")
+    
+    populasi_akhir = df_proyeksi.iloc[-1]["populasi"]
+    pemuda_akhir = df_proyeksi.iloc[-1]["pemuda"]
+    persen_perubahan_pemuda = (pemuda_akhir - pemuda_awal) / pemuda_awal * 100
+    magnitudo = abs(persen_perubahan_pemuda)
+    naik = persen_perubahan_pemuda >= 0
+    
+    info_dasar = (
+        f"populasi pemuda di **{kecamatan_pilihan}** diproyeksikan dari sekitar "
+        f"**{format_id(pemuda_awal)}** menjadi **{format_id(pemuda_akhir)} jiwa** "
+        f"dalam {jumlah_tahun} tahun (asumsi pertumbuhan {tingkat_pertumbuhan}%/tahun)"
+    )
+    
+    if magnitudo < 3:
+        if naik:
+            pesan = f"Relatif stabil -- {info_dasar}, naik tipis {persen_perubahan_pemuda:.1f}%. Belum ada tekanan berarti terhadap kebutuhan fasilitas pemuda dalam skenario ini."
+        else:
+            pesan = f"Relatif stabil -- {info_dasar}, turun tipis {magnitudo:.1f}%. Perubahan masih dalam rentang wajar, belum mengindikasikan tren migrasi keluar yang signifikan."
+    elif magnitudo < 15:
+        if naik:
+            pesan = f"Tumbuh cukup nyata -- {info_dasar} (+{persen_perubahan_pemuda:.1f}%). Perlu mulai dipikirkan penambahan kapasitas lapangan kerja dan ruang aktivitas pemuda secara bertahap."
+        else:
+            pesan = f"Menurun cukup nyata -- {info_dasar} ({persen_perubahan_pemuda:.1f}%). Pola ini layak dicermati sebagai kemungkinan awal tren migrasi keluar pemuda."
+    else:
+        if naik:
+            pesan = f"Melonjak signifikan -- {info_dasar} (+{persen_perubahan_pemuda:.1f}%). Lonjakan sebesar ini perlu direspons dengan perencanaan serius: perluasan lapangan kerja, pelatihan keterampilan, dan fasilitas publik untuk pemuda."
+        else:
+            pesan = f"Menyusut tajam -- {info_dasar} ({persen_perubahan_pemuda:.1f}%). Penyusutan setajam ini mengindikasikan potensi migrasi keluar pemuda yang serius dan perlu ditindaklanjuti dengan kajian lebih lanjut."
+    
+    if naik:
+        st.success(f"📌 {pesan}")
+    else:
+        st.warning(f"📌 {pesan}")
+    
+    st.caption(
+        "⚠️ Proyeksi ini adalah simulasi sederhana berbasis asumsi pertumbuhan linear "
+        "(compound growth), bukan model demografi penuh -- belum memperhitungkan "
+        "migrasi, mortalitas, atau fertilitas secara terpisah."
+    )
+    
+    # --- Tabel detail (untuk cek angka per tahun saat validasi) ---
+    with st.expander("🔍 Lihat tabel proyeksi per tahun (untuk validasi)"):
+        tabel = df_proyeksi.copy()
+        tabel["populasi"] = tabel["populasi"].round(0).astype(int)
+        tabel["pemuda"] = tabel["pemuda"].round(0).astype(int)
+        st.dataframe(tabel, width='stretch', hide_index=True)
+
 
 # ==========================================================
 # FOOTER
