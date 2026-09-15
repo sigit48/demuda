@@ -709,10 +709,8 @@ with tab4:
 # TAB 5 -- WHATIF
 # ==========================================================
 with tab5:
-   st.subheader("Simulasi Proyeksi Pemuda (What-If)")
-
-    @st.cache_data
-    
+    st.subheader("Simulasi Proyeksi Pemuda (What-If)")
+   
     st.title("🧪 Uji Coba: Simulasi Proyeksi Pemuda")
     
     # ==========================================================
