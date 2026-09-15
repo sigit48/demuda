@@ -709,51 +709,10 @@ with tab4:
 # TAB 5 -- WHATIF
 # ==========================================================
 with tab5:
-    st.set_page_config(page_title="What-If Demografi", page_icon="🧪", layout="wide")
-    
-    PALET = {"teal": "#0F6E56", "amber": "#EF9F27"}
-
-    # --- Data sama persis dengan app_demografi.py, supaya hasil uji representatif ---
-    DATA_DASAR_KECAMATAN = [
-        ("Bagelen",      30965,  63.44),
-        ("Banyuurip",    44221,  47.78),
-        ("Bayan",        53220,  44.66),
-        ("Bener",        58913, 102.44),
-        ("Bruno",        55454, 105.68),
-        ("Butuh",        42998,  47.21),
-        ("Gebang",       44525,  70.51),
-        ("Grabag",       51175,  67.80),
-        ("Kaligesing",   32564,  78.33),
-        ("Kemiri",       61008, 103.15),
-        ("Kutoarjo",     63172,  39.20),
-        ("Loano",        39201,  53.51),
-        ("Ngombol",      36202,  59.33),
-        ("Pituruh",      53095,  89.01),
-        ("Purwodadi",    42725,  56.15),
-        ("Purworejo",    85595,  53.25),
-    ]
-
-    P_PRODUKTIF_KAB = 0.674702
-    P_LANSIA_KAB = 0.123679
-    PEMUDA_DARI_PRODUKTIF = 0.216137 / 0.674702
-
+   st.subheader("Simulasi Proyeksi Pemuda (What-If)")
 
     @st.cache_data
-    def load_data():
-        df = pd.DataFrame(DATA_DASAR_KECAMATAN, columns=["kecamatan", "total_penduduk", "luas_km2"])
-        df["kepadatan"] = df["total_penduduk"] / df["luas_km2"]
-        kepadatan_rata2_kab = df["total_penduduk"].sum() / df["luas_km2"].sum()
-        z = (df["kepadatan"] / kepadatan_rata2_kab) - 1
-        z_clipped = z.clip(-0.4, 0.4)
-        produktif_share = (P_PRODUKTIF_KAB * (1 + 0.12 * z_clipped)).clip(0.60, 0.75)
-        lansia_share = (P_LANSIA_KAB * (1 - 0.15 * z_clipped)).clip(0.08, 0.18)
-        pemuda_share = produktif_share * PEMUDA_DARI_PRODUKTIF
-        df["pemuda_16_30"] = (df["total_penduduk"] * pemuda_share).round().astype(int)
-        return df
     
-    
-    df = load_data()
-
     st.title("🧪 Uji Coba: Simulasi Proyeksi Pemuda")
     
     # ==========================================================
@@ -785,7 +744,7 @@ with tab5:
         populasi_awal = baris["total_penduduk"]
         pemuda_awal = baris["pemuda_16_30"]
     
-    # --- Rumus pertumbuhan majemuk ---
+    # --- Hitung proyeksi tahun demi tahun (rumus pertumbuhan majemuk) ---
     tahun_list = list(range(0, jumlah_tahun + 1))
     proyeksi_list = []
     for tahun in tahun_list:
@@ -806,10 +765,6 @@ with tab5:
     )
     fig.update_layout(height=450)
     st.plotly_chart(fig, width='stretch')
-    
-    # --- Insight otomatis (peka terhadap besaran perubahan) ---
-    def format_id(n):
-        return f"{n:,.0f}".replace(",", ".")
     
     populasi_akhir = df_proyeksi.iloc[-1]["populasi"]
     pemuda_akhir = df_proyeksi.iloc[-1]["pemuda"]
