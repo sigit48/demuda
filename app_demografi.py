@@ -415,7 +415,7 @@ st.download_button(
     mime="application/pdf",
 )
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4 = st.tabs([
     "📊 Ringkasan Kabupaten",
     "🗺️ Peta & Profil Kecamatan",
     "🧑‍🤝‍🧑 Fokus Pemuda",
