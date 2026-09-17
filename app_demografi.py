@@ -10,9 +10,6 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
 
-# ==========================================================
-# KONFIGURASI HALAMAN
-# ==========================================================
 st.set_page_config(
     page_title="DEMUDA Purworejo",
     page_icon="🗺️",
@@ -85,49 +82,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ==========================================================
-# 📊 DATA -- HASIL ESTIMASI DARI DUA SUMBER RESMI BPS
-# ==========================================================
-# METODOLOGI (penting untuk dijelaskan ke juri):
-# BPS Kabupaten Purworejo mempublikasikan dua tabel terpisah yang TIDAK bisa
-# langsung digabung mentah-mentah:
-#   1. "Jumlah Penduduk Menurut Kelompok Umur dan Jenis Kelamin di Kabupaten
-#      Purworejo, 2026" -- breakdown umur, tapi HANYA level kabupaten (agregat),
-#      tidak dipecah per kecamatan.
-#   2. "Jumlah Penduduk ... Menurut Kecamatan di Kabupaten Purworejo" (BPS,
-#      dikutip dalam "Kabupaten Purworejo Dalam Angka 2025") -- total penduduk
-#      DAN LUAS WILAYAH per kecamatan (estimasi pertengahan 2024).
-#
-# LANGKAH 1 -- proporsi umur dasar kabupaten (dari sumber 1, total 808.153 jiwa):
-#   - 0-14 tahun (anak)      : 20,17%
-#   - 15-64 tahun (produktif): 67,47%
-#   - 65+ tahun (lansia)     : 12,37%
-#   - 15-29 tahun ("pemuda", proksi terdekat untuk 16-30 dari band 5-tahunan
-#     BPS): 21,61% dari total, atau setara 32,0% dari kelompok produktif.
-#
-# LANGKAH 2 -- karena BPS tidak mempublikasikan breakdown umur PER KECAMATAN,
-# proporsi di atas TIDAK bisa langsung dipukul rata ke semua kecamatan (itu
-# akan membuat rasio ketergantungan & proporsi pemuda identik di semua
-# kecamatan -- tidak informatif). Sebagai gantinya, proporsi disesuaikan
-# per kecamatan menggunakan KEPADATAN PENDUDUK (penduduk riil / luas wilayah,
-# keduanya data resmi BPS) sebagai indikator pendekatan urbanisasi:
-#   - Kecamatan lebih padat (pusat kota/ekonomi) diasumsikan menarik lebih
-#     banyak penduduk usia produktif & pemuda (migrasi kerja/pendidikan).
-#   - Kecamatan kurang padat (pedesaan/pegunungan) diasumsikan proporsi
-#     lansia sedikit lebih tinggi (pemuda merantau ke kota).
-# Penyesuaian dibatasi (clipping) maksimal +-40% deviasi dari rata-rata
-# kabupaten, supaya variasi yang muncul tetap realistis dan tidak
-# dilebih-lebihkan. Proporsi pemuda selalu dihitung sebagai 32,0% dari
-# proporsi produktif (rasio kabupaten) sehingga pemuda tetap konsisten
-# sebagai subset dari kelompok produktif di tiap kecamatan.
-#
-# ⚠️ Ini tetap ESTIMASI, bukan data resmi per kecamatan per kelompok umur --
-# dijelaskan terbuka ke pengguna lewat expander "Metodologi & Sumber Data".
-
-# Data dasar riil per kecamatan: total penduduk (estimasi pertengahan 2024,
-# BPS "Kabupaten Purworejo Dalam Angka 2025") & luas wilayah (km2, sumber sama).
 DATA_DASAR_KECAMATAN = [
-    # nama,          lat,        lon,         total_penduduk, luas_km2
     ("Bagelen",      -7.81128,  110.04006,    30965,          63.44),
     ("Banyuurip",    -7.75608,  109.97645,    44221,          47.78),
     ("Bayan",        -7.71026,  109.94889,    53220,          44.66),
@@ -146,35 +101,45 @@ DATA_DASAR_KECAMATAN = [
     ("Purworejo",    -7.72232,  110.03042,    85595,          53.25),
 ]
 
-# Proporsi umur dasar kabupaten (dari data BPS 2026, lihat perhitungan di atas)
 P_ANAK_KAB = 0.201677
 P_PRODUKTIF_KAB = 0.674702
 P_LANSIA_KAB = 0.123679
-PEMUDA_DARI_PRODUKTIF = 0.216137 / 0.674702  # = 0,3204 -> pemuda 15-29 sbg proporsi dari kelompok produktif
+PEMUDA_DARI_PRODUKTIF = 0.216137 / 0.674702
 
-# ==========================================================
-# 📈 DATA HISTORIS KABUPATEN (2019-2024)
-# ==========================================================
-# Sumber: dua laporan akademik yang mengutip BPS Kab. Purworejo (data total
-# kabupaten, BUKAN estimasi kami). Breakdown PER KECAMATAN multi-tahun belum
-# tersedia dalam format yang bisa diproses otomatis -- lihat catatan di
-# expander "Metodologi & Sumber Data".
-# ⚠️ Penurunan dari 2023 ke 2024 BUKAN penurunan penduduk riil, melainkan pola
-# umum saat BPS mengkalibrasi ulang proyeksi mengikuti hasil sensus terbaru.
 DATA_HISTORIS_KABUPATEN = {
     "tahun": [2019, 2020, 2021, 2022, 2023, 2024],
     "penduduk": [714816, 769880, 799411, 804335, 807790, 795033],
 }
 
+# ==========================================================
+# 📊 STRUKTUR UMUR MULTI-TAHUN (2023-2026) -- DATA RESMI BPS
+# ==========================================================
+# Sumber: 4 file resmi BPS "Jumlah Penduduk Menurut Kelompok Umur dan Jenis
+# Kelamin di Kabupaten Purworejo" edisi 2023, 2024, 2025, 2026 (diunggah
+# pengguna). BERBEDA dari DATA_HISTORIS_KABUPATEN di atas (yang bersumber
+# dari laporan akademik lain) -- data ini SATU SUMBER KONSISTEN untuk
+# seluruh rentang tahun, sehingga trennya lebih bisa dipercaya untuk
+# dibandingkan antar tahun secara langsung.
+# ⚠️ CATATAN PENTING: file edisi 2023 dan 2024 berisi angka yang IDENTIK
+# PERSIS (kemungkinan besar BPS belum memperbarui proyeksi antara dua
+# rilis tersebut) -- maka keduanya digabung jadi satu titik "2023-2024"
+# di bawah, bukan dianggap 2 observasi independen.
+DATA_STRUKTUR_UMUR_HISTORIS = [
+    {"label": "2023-2024", "anak_pct": 20.41, "produktif_pct": 68.43, "lansia_pct": 11.16,
+     "pemuda_pct": 22.36, "rasio_ketergantungan": 46.14},
+    {"label": "2025", "anak_pct": 20.22, "produktif_pct": 67.81, "lansia_pct": 11.96,
+     "pemuda_pct": 21.91, "rasio_ketergantungan": 47.46},
+    {"label": "2026", "anak_pct": 20.17, "produktif_pct": 67.47, "lansia_pct": 12.37,
+     "pemuda_pct": 21.61, "rasio_ketergantungan": 48.22},
+]
+
 @st.cache_data
 def load_data():
     df = pd.DataFrame(DATA_DASAR_KECAMATAN, columns=["kecamatan", "lat", "lon", "total_penduduk", "luas_km2"])
-
-    # --- Hitung kepadatan & faktor penyesuaian (lihat metodologi di atas) ---
     df["kepadatan"] = df["total_penduduk"] / df["luas_km2"]
     kepadatan_rata2_kab = df["total_penduduk"].sum() / df["luas_km2"].sum()
     z = (df["kepadatan"] / kepadatan_rata2_kab) - 1
-    z_clipped = z.clip(-0.4, 0.4)  # batasi deviasi maksimal +-40% dari rata-rata kabupaten
+    z_clipped = z.clip(-0.4, 0.4)
 
     produktif_share = (P_PRODUKTIF_KAB * (1 + 0.12 * z_clipped)).clip(0.60, 0.75)
     lansia_share = (P_LANSIA_KAB * (1 - 0.15 * z_clipped)).clip(0.08, 0.18)
@@ -183,16 +148,12 @@ def load_data():
 
     df["penduduk_15_64"] = (df["total_penduduk"] * produktif_share).round().astype(int)
     df["penduduk_65_plus"] = (df["total_penduduk"] * lansia_share).round().astype(int)
-    # anak = sisa, supaya total per kecamatan TETAP PERSIS sama dengan data riil BPS
     df["penduduk_0_14"] = df["total_penduduk"] - df["penduduk_15_64"] - df["penduduk_65_plus"]
     df["pemuda_16_30"] = (df["total_penduduk"] * pemuda_share).round().astype(int)
 
     df["penduduk_non_produktif"] = df["penduduk_0_14"] + df["penduduk_65_plus"]
-    # Rasio ketergantungan = (non-produktif / produktif) x 100
     df["rasio_ketergantungan"] = (df["penduduk_non_produktif"] / df["penduduk_15_64"] * 100).round(1)
-    # Proporsi pemuda terhadap total penduduk usia produktif
     df["proporsi_pemuda_dari_produktif"] = (df["pemuda_16_30"] / df["penduduk_15_64"] * 100).round(1)
-    # Proporsi pemuda terhadap total penduduk kecamatan
     df["proporsi_pemuda_dari_total"] = (df["pemuda_16_30"] / df["total_penduduk"] * 100).round(1)
     return df
 
@@ -214,6 +175,13 @@ with st.expander("ℹ️ Metodologi & Sumber Data"):
     2. **Populasi & luas wilayah per kecamatan** -- BPS Kab. Purworejo,
        *"Kabupaten Purworejo Dalam Angka 2025"* (estimasi pertengahan 2024,
        per kecamatan, tanpa breakdown umur).
+
+    Untuk grafik "Tren Struktur Umur Kabupaten" di Tab Ringkasan, digunakan
+    **4 edisi tambahan** dari sumber yang sama (BPS, *"Jumlah Penduduk
+    Menurut Kelompok Umur..."* edisi 2023, 2024, 2025, dan 2026) -- satu
+    sumber konsisten untuk seluruh rentang tahun, sehingga tren rasio
+    ketergantungan & proporsi pemuda dari tahun ke tahun bisa dibandingkan
+    langsung tanpa perlu estimasi tambahan.
 
     Karena BPS tidak mempublikasikan breakdown umur *per kecamatan* secara
     terbuka, breakdown umur tiap kecamatan pada dashboard ini adalah
@@ -260,25 +228,11 @@ with st.expander("Konteks: Bonus Demografi & Generasi Emas 2045"):
 
 
 
-# ==========================================================
-# 📌 KALKULASI AGREGAT TERPUSAT
-# ==========================================================
-# Dihitung sekali di sini, dipakai bareng oleh Ringkasan Eksekutif, Tab 1,
-# dan Tab 3 -- supaya tidak ada perhitungan yang diulang/berpotensi beda hasil.
 def format_id(n):
-    """Format angka ala Indonesia (titik sbg pemisah ribuan) TANPA mengganggu
-    tanda baca lain di kalimat -- dipakai per-angka, bukan replace massal
-    di seluruh string (itu bug yang pernah bikin koma kalimat ikut berubah)."""
     return f"{n:,.0f}".replace(",", ".")
 
 
 def markdown_bold_ke_html(teks):
-    """⚠️ FIX BUG: markdown **tebal** TIDAK otomatis dirender jadi bold kalau
-    ditaruh di dalam blok HTML mentah (st.markdown unsafe_allow_html) --
-    parser Markdown memperlakukan konten di dalam tag HTML sebagai teks
-    apa adanya, tidak diproses lagi jadi HTML. Fungsi ini mengonversi
-    **teks** secara eksplisit jadi <b>teks</b> SEBELUM ditaruh di dalam HTML,
-    supaya tetap tampil tebal dengan benar."""
     import re
     return re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", teks)
 
@@ -295,9 +249,6 @@ terendah = ranking.iloc[-1]
 rata_rata_proporsi = ranking["proporsi_pemuda_dari_total"].mean()
 jumlah_di_atas_rata2 = int((ranking["proporsi_pemuda_dari_total"] > rata_rata_proporsi).sum())
 
-# ==========================================================
-# 🌟 RINGKASAN EKSEKUTIF + UNDUH LAPORAN
-# ==========================================================
 ringkasan_teks = (
     f"Kabupaten Purworejo memiliki **{format_id(total_penduduk)}** penduduk (estimasi terkini), dengan "
     f"**{format_id(total_produktif)}** jiwa usia produktif dan **{format_id(total_pemuda)}** jiwa pemuda (15-29 tahun). "
@@ -352,9 +303,6 @@ st.download_button(
 
 
 def buat_pdf_laporan():
-    """Membuat laporan PDF ringkas menggunakan reportlab -- tidak perlu
-    template eksternal apapun, seluruh isi dibuat dari data yang sudah
-    dihitung di atas (total_penduduk, ranking, dll)."""
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
         buffer, pagesize=A4, topMargin=2 * cm, bottomMargin=2 * cm,
@@ -422,9 +370,6 @@ tab1, tab2, tab3, tab4 = st.tabs([
     "⚖️ Bandingkan Kecamatan",
    # "🔮 Simulasi Proyeksi"
 ])
-# ==========================================================
-# TAB 1 -- RINGKASAN KABUPATEN
-# ==========================================================
 with tab1:
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Total Penduduk", format_id(total_penduduk))
@@ -473,9 +418,42 @@ with tab1:
         "sensus terbaru, bukan penurunan penduduk riil."
     )
 
-# ==========================================================
-# TAB 2 -- PETA & PROFIL KECAMATAN
-# ==========================================================
+    st.markdown("---")
+    st.subheader("👥 Tren Struktur Umur Kabupaten (2023-2026)")
+    df_struktur_historis = pd.DataFrame(DATA_STRUKTUR_UMUR_HISTORIS)
+    fig_struktur = go.Figure()
+    fig_struktur.add_trace(go.Scatter(
+        x=df_struktur_historis["label"], y=df_struktur_historis["rasio_ketergantungan"],
+        name="Rasio Ketergantungan (%)", mode="lines+markers",
+        line=dict(color=PALET["teal"], width=3)
+    ))
+    fig_struktur.add_trace(go.Scatter(
+        x=df_struktur_historis["label"], y=df_struktur_historis["pemuda_pct"],
+        name="Proporsi Pemuda (%)", mode="lines+markers",
+        line=dict(color=PALET["amber"], width=3)
+    ))
+    fig_struktur.update_layout(height=320, yaxis_title="Persen (%)", legend=dict(orientation="h", y=-0.2))
+    st.plotly_chart(fig_struktur, width='stretch')
+
+    rasio_awal = df_struktur_historis.iloc[0]["rasio_ketergantungan"]
+    rasio_akhir = df_struktur_historis.iloc[-1]["rasio_ketergantungan"]
+    pemuda_awal_pct = df_struktur_historis.iloc[0]["pemuda_pct"]
+    pemuda_akhir_pct = df_struktur_historis.iloc[-1]["pemuda_pct"]
+    st.warning(
+        f"📌 **Insight otomatis (berbasis data resmi multi-tahun BPS, bukan estimasi):** "
+        f"Rasio ketergantungan kabupaten naik dari {rasio_awal}% ({df_struktur_historis.iloc[0]['label']}) "
+        f"menjadi {rasio_akhir}% ({df_struktur_historis.iloc[-1]['label']}), sementara proporsi pemuda "
+        f"justru turun dari {pemuda_awal_pct}% menjadi {pemuda_akhir_pct}% pada periode yang sama. "
+        f"Tren ini mengindikasikan struktur penduduk Purworejo mulai menua secara bertahap -- "
+        f"memperkuat urgensi program penyiapan pemuda **sebelum jendela bonus demografi menyempit**."
+    )
+    st.caption(
+        "Sumber: 4 file resmi BPS \"Jumlah Penduduk Menurut Kelompok Umur dan Jenis Kelamin\" "
+        "edisi 2023-2026 -- satu sumber konsisten untuk seluruh rentang tahun. Data edisi 2023 "
+        "dan 2024 identik (BPS belum memperbarui proyeksi antar rilis), sehingga digabung jadi "
+        "satu titik \"2023-2024\"."
+    )
+
 with tab2:
     st.subheader("Peta Sebaran Penduduk per Kecamatan")
 
@@ -489,10 +467,6 @@ with tab2:
         }[x]
     )
 
-    # ⚠️ FIX AttributeError: sejak Plotly >= 5.24, px.scatter_mapbox() dihapus
-    # dan diganti px.scatter_map() (basis peta baru MapLibre, bukan Mapbox lagi).
-    # Kode di bawah otomatis pakai fungsi yang tersedia sesuai versi plotly
-    # yang terpasang, supaya tidak error di komputer manapun.
     if hasattr(px, "scatter_map"):
         fig_map = px.scatter_map(
             df,
@@ -535,9 +509,6 @@ with tab2:
         )
     fig_map.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
-    # ⚡ FITUR INTERAKTIF: klik salah satu titik di peta untuk lihat kartu
-    # detail kecamatan -- pakai fitur "selection event" bawaan Streamlit
-    # (on_select), tidak perlu library tambahan.
     peta_event = st.plotly_chart(
         fig_map, width='stretch', on_select="rerun", selection_mode="points", key="peta_klik"
     )
@@ -573,9 +544,6 @@ with tab2:
     ]
     st.dataframe(tabel_tampil, width='stretch', hide_index=True)
 
-# ==========================================================
-# TAB 3 -- FOKUS PEMUDA
-# ==========================================================
 with tab3:
     st.subheader("Ranking Kecamatan Berdasarkan Potensi Pemuda")
 
@@ -590,12 +558,6 @@ with tab3:
     fig_rank.update_layout(height=550, yaxis={"categoryorder": "total ascending"}, showlegend=False)
     st.plotly_chart(fig_rank, width='stretch')
 
-    # ------------------------------------------------------
-    # 🧠 INSIGHT OTOMATIS RULE-BASED (bukan AI generatif)
-    # Sengaja dibuat rule-based, bukan panggil LLM/API eksternal,
-    # supaya dashboard ini TIDAK bergantung pada server/koneksi luar
-    # apapun -- selalu jalan walau offline sekalipun (setelah data dimuat).
-    # ------------------------------------------------------
     st.markdown("---")
     st.subheader("📋 Insight Otomatis")
 
@@ -617,9 +579,6 @@ with tab3:
         f"yang berada di atas rata-rata kabupaten."
     )
 
-# ==========================================================
-# TAB 4 -- BANDINGKAN KECAMATAN
-# ==========================================================
 with tab4:
     st.subheader("Bandingkan 2 Kecamatan Berdampingan")
 
@@ -632,10 +591,6 @@ with tab4:
         kec_b = st.selectbox("Kecamatan kedua:", daftar_kecamatan, index=daftar_kecamatan.index(default_b))
 
     if kec_a == kec_b:
-        # ⚠️ FIX BUG: tanpa pengecekan ini, membandingkan kecamatan dengan
-        # dirinya sendiri menghasilkan kalimat aneh ("X dan X relatif setara")
-        # dan radar chart dengan dua bentuk numpuk sempurna -- bingungkan
-        # pengguna. Hentikan lebih awal dengan pesan yang jelas.
         st.warning("⚠️ Pilih dua kecamatan yang berbeda untuk membandingkan.")
     else:
         baris_a = df[df["kecamatan"] == kec_a].iloc[0]
@@ -656,8 +611,6 @@ with tab4:
         st.markdown("---")
         st.subheader("Radar Perbandingan (skala relatif terhadap kabupaten)")
 
-        # Normalisasi tiap metrik terhadap rentang min-maks seluruh kecamatan,
-        # supaya bentuk radar tetap terbaca meski satuan tiap metrik beda jauh.
         metrik_radar = ["total_penduduk", "kepadatan", "proporsi_pemuda_dari_total", "rasio_ketergantungan"]
         label_radar = ["Total Penduduk", "Kepadatan", "Proporsi Pemuda", "Rasio Ketergantungan"]
         min_vals = df[metrik_radar].min()
@@ -690,7 +643,6 @@ with tab4:
             "se-kabupaten untuk tiap metrik -- bukan skala absolut, tapi untuk membandingkan posisi relatif."
         )
 
-        # --- Insight otomatis perbandingan ---
         selisih_pemuda = baris_a["proporsi_pemuda_dari_total"] - baris_b["proporsi_pemuda_dari_total"]
         if abs(selisih_pemuda) < 0.5:
             st.info(f"📌 Proporsi pemuda **{kec_a}** dan **{kec_b}** relatif setara (selisih {abs(selisih_pemuda):.1f}%).")
@@ -706,9 +658,6 @@ with tab4:
             )
 
 
-# ==========================================================
-# FOOTER
-# ==========================================================
 st.markdown("---")
 st.caption(
     "Dibuat untuk Lomba Teknologi Piranti Lunak -- Jambore Pemuda Tingkat "
