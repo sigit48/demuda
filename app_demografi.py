@@ -433,6 +433,13 @@ with tab1:
         line=dict(color=PALET["amber"], width=3)
     ))
     fig_struktur.update_layout(height=320, yaxis_title="Persen (%)", legend=dict(orientation="h", y=-0.2))
+    # ⚠️ FIX BUG: tanpa ini, Plotly menganggap label "2025"/"2026" sebagai
+    # angka kontinu (bukan kategori teks), sehingga sumbu X jadi skala
+    # numerik aneh (2025, 2025.2, 2025.4, ...) dan titik "2023-2024" (label
+    # teks, bukan angka murni) BISA HILANG dari grafik karena tidak terbaca
+    # sebagai nilai numerik. Memaksa type="category" membuat ketiga titik
+    # tampil sebagai label diskrit berjarak rata, sesuai urutan data asli.
+    fig_struktur.update_xaxes(type="category")
     st.plotly_chart(fig_struktur, width='stretch')
 
     rasio_awal = df_struktur_historis.iloc[0]["rasio_ketergantungan"]
