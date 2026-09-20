@@ -746,12 +746,12 @@ with tab5 :
         "migrasi, mortalitas, atau fertilitas secara terpisah."
     )
 
-# --- Tabel detail ---
-with st.expander("🔍 Lihat tabel proyeksi per tahun (untuk validasi)"):
-    tabel = df_proyeksi.copy()
-    tabel["populasi"] = tabel["populasi"].round(0).astype(int)
-    tabel["pemuda"] = tabel["pemuda"].round(0).astype(int)
-    st.dataframe(tabel, width='stretch', hide_index=True)
+    # --- Tabel detail ---
+    with st.expander("🔍 Lihat tabel proyeksi per tahun (untuk validasi)"):
+        tabel = df_proyeksi.copy()
+        tabel["populasi"] = tabel["populasi"].round(0).astype(int)
+        tabel["pemuda"] = tabel["pemuda"].round(0).astype(int)
+        st.dataframe(tabel, width='stretch', hide_index=True)
 
 
 st.markdown("---")
