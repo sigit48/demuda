@@ -111,11 +111,6 @@ DATA_HISTORIS_KABUPATEN = {
     "penduduk": [714816, 769880, 799411, 804335, 807790, 795033],
 }
 
-# ==========================================================
-# 📊 STRUKTUR UMUR MULTI-TAHUN (2023-2026) -- DATA RESMI BPS
-# ==========================================================
-
-
 DATA_STRUKTUR_UMUR_HISTORIS = [
     {"label": "2023-2024", "anak_pct": 20.41, "produktif_pct": 68.43, "lansia_pct": 11.16,
      "pemuda_pct": 22.36, "rasio_ketergantungan": 46.14},
@@ -476,7 +471,7 @@ with tab2:
             zoom=9.3,
             center={"lat": -7.72, "lon": 109.98},
             map_style="open-street-map",
-            height=550,
+            height=650,
         )
     else:
         fig_map = px.scatter_mapbox(
@@ -496,7 +491,7 @@ with tab2:
             zoom=9.3,
             center={"lat": -7.72, "lon": 109.98},
             mapbox_style="open-street-map",
-            height=550,
+            height=650,
         )
     fig_map.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
@@ -602,8 +597,8 @@ with tab4:
         st.markdown("---")
         st.subheader("Radar Perbandingan (skala relatif terhadap kabupaten)")
 
-        metrik_radar = ["total_penduduk", "kepadatan", "proporsi_pemuda_dari_total", "rasio_ketergantungan"]
-        label_radar = ["Total Penduduk", "Kepadatan", "Proporsi Pemuda", "Rasio Ketergantungan"]
+        metrik_radar = ["total_penduduk", "luas_km2", "proporsi_pemuda_dari_total", "rasio_ketergantungan"]
+        label_radar = ["Total Penduduk", "Luas Wilayah", "Proporsi Pemuda", "Rasio Ketergantungan"]
         min_vals = df[metrik_radar].min()
         max_vals = df[metrik_radar].max()
 
@@ -617,21 +612,27 @@ with tab4:
         fig_radar.add_trace(go.Scatterpolar(
             r=skala_radar(baris_a) + [skala_radar(baris_a)[0]],
             theta=label_radar + [label_radar[0]],
-            fill="toself", name=kec_a, line_color=PALET["teal"]
+            fill="toself", name=kec_a, line_color=PALET["teal"], line_width=2.5,
+            fillcolor="rgba(15,110,86,0.35)", marker=dict(size=6)
         ))
         fig_radar.add_trace(go.Scatterpolar(
             r=skala_radar(baris_b) + [skala_radar(baris_b)[0]],
             theta=label_radar + [label_radar[0]],
-            fill="toself", name=kec_b, line_color=PALET["amber"]
+            fill="toself", name=kec_b, line_color=PALET["amber"], line_width=2.5,
+            fillcolor="rgba(239,159,39,0.35)", marker=dict(size=6)
         ))
         fig_radar.update_layout(
-            polar=dict(radialaxis=dict(visible=True, range=[0, 100], showticklabels=False)),
-            height=450, showlegend=True
+            polar=dict(radialaxis=dict(
+                visible=True, range=[0, 100], showticklabels=True,
+                tickvals=[0, 25, 50, 75, 100], ticksuffix="%"
+            )),
+            height=480, showlegend=True
         )
         st.plotly_chart(fig_radar, width='stretch')
         st.caption(
             "Nilai pada radar dinormalisasi 0-100% relatif terhadap kecamatan tertinggi/terendah "
-            "se-kabupaten untuk tiap metrik -- bukan skala absolut, tapi untuk membandingkan posisi relatif."
+            "se-kabupaten untuk tiap metrik -- bukan skala absolut, tapi untuk membandingkan posisi relatif. "
+            "Area yang tumpang tindih (transparan) menunjukkan kemiripan antar kecamatan."
         )
 
         selisih_pemuda = baris_a["proporsi_pemuda_dari_total"] - baris_b["proporsi_pemuda_dari_total"]
@@ -647,7 +648,6 @@ with tab4:
                 f"📌 **{kec_b}** memiliki proporsi pemuda {abs(selisih_pemuda):.1f}% lebih tinggi dibanding "
                 f"**{kec_a}** -- bisa jadi acuan praktik baik yang mungkin relevan diterapkan di {kec_a}."
             )
-
 
 st.markdown("---")
 st.caption(
