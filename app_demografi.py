@@ -152,6 +152,133 @@ st.caption(
     "Kabupaten Purworejo (lihat metodologi di bawah)."
 )
 
+# =====================================================================
+# DOKUMENTASI & BANTUAN (Cara Menggunakan Aplikasi)
+# =====================================================================
+with st.expander("📖 Cara Menggunakan Aplikasi (klik untuk membuka panduan)"):
+    st.markdown(textwrap.dedent("""
+    Selamat datang di **DEMUDA Purworejo**. Aplikasi ini membantu Anda melihat
+    *di kecamatan mana potensi pemuda paling besar* dan *di mana perlu perhatian
+    lebih*, tanpa perlu keahlian analisis data. Ikuti 4 langkah singkat berikut.
+    """))
+
+    st.markdown("##### 🚀 Mulai dalam 4 langkah")
+    st.markdown(textwrap.dedent("""
+    1. **Baca Ringkasan Eksekutif** (kotak hijau di bawah panduan ini) untuk
+       gambaran besar kondisi pemuda Kabupaten Purworejo.
+    2. **Buka tab** di bagian tengah halaman. Ada 5 tab, tiap tab menjawab
+       pertanyaan yang berbeda (lihat tabel di bawah).
+    3. **Berinteraksi dengan grafik dan peta**: arahkan kursor, klik, atau pilih
+       kecamatan dari menu.
+    4. **Unduh laporan** (tombol *Unduh .txt* atau *Unduh .pdf*) untuk dibawa ke
+       rapat atau dilampirkan pada proposal program.
+    """))
+
+    st.markdown("##### 🧭 Fungsi tiap tab")
+    st.markdown(textwrap.dedent("""
+    | Tab | Pertanyaan yang dijawab | Cara pakai |
+    |---|---|---|
+    | 📊 **Ringkasan Kabupaten** | Bagaimana struktur usia dan tren penduduk Purworejo? | Lihat 4 angka utama, lalu gulir ke bawah untuk grafik struktur usia dan tren 2019-2026. |
+    | 🗺️ **Peta & Profil Kecamatan** | Di mana penduduk dan pemuda terkonsentrasi? | Pilih metrik pada menu, lalu **klik titik** kecamatan di peta untuk melihat kartu detailnya. Tabel profil lengkap ada di bagian bawah. |
+    | 🧑‍🤝‍🧑 **Fokus Pemuda** | Kecamatan mana yang proporsi pemudanya tertinggi/terendah? | Baca grafik ranking dan *Insight Otomatis* di bawahnya. |
+    | ⚖️ **Bandingkan Kecamatan** | Bagaimana dua kecamatan dibandingkan? | Pilih **dua kecamatan berbeda** pada dua menu, lalu lihat angka berdampingan dan grafik radar. |
+    | 🔮 **Simulasi Proyeksi** | Bagaimana jumlah pemuda 5-25 tahun ke depan? | Pilih kecamatan, geser **slider pertumbuhan** dan **jumlah tahun**. Grafik dan kesimpulan berubah otomatis. |
+    """))
+
+    st.markdown("##### 🖱️ Tips berinteraksi dengan grafik")
+    st.markdown(textwrap.dedent("""
+    - **Arahkan kursor** ke batang, garis, atau titik untuk melihat angka pastinya.
+    - **Zoom peta**: scroll mouse atau cubit layar (HP). **Geser peta**: tarik dengan mouse/jari.
+    - **Reset tampilan grafik**: klik dua kali pada area grafik.
+    - **Simpan grafik sebagai gambar**: klik ikon 📷 di pojok kanan atas grafik.
+    - **Urutkan tabel**: klik judul kolom. **Perbesar tabel**: klik ikon layar penuh di pojoknya.
+    - **Klik nama pada legenda** grafik untuk menyembunyikan/menampilkan garis tertentu.
+    """))
+
+    st.markdown("##### 🎯 Contoh skenario penggunaan")
+    st.markdown(textwrap.dedent("""
+    - *"Kecamatan mana yang diprioritaskan untuk pelatihan wirausaha muda?"*
+      → Tab **Fokus Pemuda**, lihat kecamatan dengan proporsi pemuda tertinggi.
+    - *"Apakah pemuda di kecamatan saya berkurang dalam 10 tahun?"*
+      → Tab **Simulasi Proyeksi**, pilih kecamatan, atur pertumbuhan penduduk, baca kesimpulan.
+    - *"Kenapa kecamatan A dan B berbeda?"*
+      → Tab **Bandingkan Kecamatan**, lihat radar dan selisih proporsi pemuda.
+    """))
+
+    st.info(
+        "💡 Panduan cepat, glosarium istilah, dan tanya jawab (FAQ) juga tersedia di "
+        "**sidebar sebelah kiri** (klik tanda **›** di pojok kiri atas jika sidebar tertutup)."
+    )
+
+with st.sidebar:
+    st.markdown("### 📖 Bantuan")
+    st.caption("Panduan singkat penggunaan DEMUDA Purworejo")
+
+    with st.expander("🚀 Panduan Cepat", expanded=True):
+        st.markdown(textwrap.dedent("""
+        1. Baca **Ringkasan Eksekutif**.
+        2. Pilih salah satu dari **5 tab**.
+        3. **Klik peta** atau **pilih kecamatan** untuk detail.
+        4. **Unduh laporan** (.txt / .pdf).
+
+        Panduan lengkap: buka **"📖 Cara Menggunakan Aplikasi"** di halaman utama.
+        """))
+
+    with st.expander("📚 Glosarium Istilah"):
+        st.markdown(textwrap.dedent("""
+        **Usia produktif**: penduduk 15-64 tahun.
+
+        **Pemuda (proksi)**: penduduk 15-29 tahun, pendekatan terdekat dari
+        kelompok umur 5-tahunan BPS untuk definisi pemuda 16-30 tahun.
+
+        **Rasio ketergantungan**: jumlah penduduk non-produktif (anak 0-14 th
+        dan lansia 65+) per 100 penduduk usia produktif. Makin rendah, makin
+        ringan beban usia produktif.
+
+        **Proporsi pemuda**: persentase pemuda dari total penduduk kecamatan.
+
+        **Kepadatan penduduk**: jumlah penduduk per km².
+
+        **Bonus demografi**: kondisi ketika usia produktif jauh lebih banyak
+        dari usia non-produktif sehingga peluang pertumbuhan ekonomi terbuka.
+
+        **Estimasi**: angka hasil perhitungan berbasis data resmi, bukan hasil
+        sensus langsung.
+
+        **Proyeksi (compound growth)**: perhitungan pertumbuhan berbunga dengan
+        laju tetap per tahun.
+        """))
+
+    with st.expander("❓ Tanya Jawab (FAQ)"):
+        st.markdown(textwrap.dedent("""
+        **Apakah angka per kecamatan data resmi?**
+        Total penduduk dan luas wilayah per kecamatan resmi dari BPS. Pembagian
+        kelompok umur per kecamatan adalah *estimasi* (lihat "Metodologi & Sumber Data").
+
+        **Mengapa "Pemuda 15-29" padahal definisi 16-30 tahun?**
+        BPS menerbitkan data per kelompok 5 tahun, sehingga 15-29 dipakai
+        sebagai pendekatan terdekat.
+
+        **Peta tidak muncul / kosong?**
+        Peta memerlukan koneksi internet (peta dasar OpenStreetMap). Periksa
+        koneksi lalu muat ulang halaman (tekan F5).
+
+        **Tombol Unduh PDF tidak bekerja?**
+        Pastikan browser tidak memblokir unduhan. Alternatifnya gunakan
+        tombol Unduh .txt.
+
+        **Apakah hasil simulasi adalah ramalan pasti?**
+        Bukan. Simulasi hanya menghitung "bagaimana jika" berdasarkan asumsi
+        pertumbuhan yang Anda pilih, tanpa memperhitungkan migrasi,
+        kelahiran, dan kematian secara terpisah.
+
+        **Bagaimana mengembalikan pilihan ke awal?**
+        Muat ulang halaman (F5). Semua menu kembali ke nilai bawaan.
+        """))
+
+    st.markdown("---")
+    st.caption("DEMUDA Purworejo · Jambore Pemuda Kab. Purworejo 2026")
+
 with st.expander("ℹ️ Metodologi & Sumber Data"):
     st.markdown(textwrap.dedent("""
     Dashboard ini menggabungkan **dua tabel resmi BPS** yang aslinya terpisah:
@@ -284,6 +411,7 @@ st.download_button(
     data=laporan_unduh,
     file_name="ringkasan_demuda_purworejo.txt",
     mime="text/plain",
+    help="Unduh ringkasan dalam format teks sederhana.",
 )
 
 
@@ -346,14 +474,15 @@ st.download_button(
     data=buat_pdf_laporan(),
     file_name="laporan_demuda_purworejo.pdf",
     mime="application/pdf",
+    help="Unduh laporan berformat PDF berisi tabel agregat dan ranking kecamatan.",
 )
 
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📊 Ringkasan Kabupaten",
     "🗺️ Peta & Profil Kecamatan",
     "🧑‍🤝‍🧑 Fokus Pemuda",
     "⚖️ Bandingkan Kecamatan",
-    # "🔮 Simulasi Proyeksi"
+    "🔮 Simulasi Proyeksi"
 ])
 with tab1:
     c1, c2, c3, c4 = st.columns(4)
@@ -446,6 +575,7 @@ with tab2:
     metrik_peta = st.selectbox(
         "Tampilkan peta berdasarkan:",
         ["total_penduduk", "rasio_ketergantungan", "proporsi_pemuda_dari_total"],
+        help="Mengubah warna lingkaran di peta. Ukuran lingkaran selalu menunjukkan total penduduk.",
         format_func=lambda x: {
             "total_penduduk": "Total Penduduk",
             "rasio_ketergantungan": "Rasio Ketergantungan (%)",
@@ -571,10 +701,12 @@ with tab4:
     daftar_kecamatan = sorted(df["kecamatan"].tolist())
     colA, colB = st.columns(2)
     with colA:
-        kec_a = st.selectbox("Kecamatan pertama:", daftar_kecamatan, index=daftar_kecamatan.index("Purworejo"))
+        kec_a = st.selectbox("Kecamatan pertama:", daftar_kecamatan, index=daftar_kecamatan.index("Purworejo"),
+                             help="Pilih kecamatan yang ingin dibandingkan. Harus berbeda dengan kecamatan kedua.")
     with colB:
         default_b = "Kaligesing" if "Kaligesing" in daftar_kecamatan else daftar_kecamatan[-1]
-        kec_b = st.selectbox("Kecamatan kedua:", daftar_kecamatan, index=daftar_kecamatan.index(default_b))
+        kec_b = st.selectbox("Kecamatan kedua:", daftar_kecamatan, index=daftar_kecamatan.index(default_b),
+                             help="Pilih pembanding. Hasil ditampilkan berdampingan beserta grafik radar.")
 
     if kec_a == kec_b:
         st.warning("⚠️ Pilih dua kecamatan yang berbeda untuk membandingkan.")
@@ -597,6 +729,14 @@ with tab4:
         st.markdown("---")
         st.subheader("Radar Perbandingan (skala relatif terhadap kabupaten)")
 
+        # ⚠️ FIX: sebelumnya pakai "kepadatan" sebagai salah satu sumbu -- tapi
+        # kepadatan, proporsi_pemuda, dan rasio_ketergantungan SEMUANYA berasal
+        # dari rumus penyesuaian yang sama (lihat load_data), sehingga ketiganya
+        # selalu bergerak bareng. Akibatnya radar 2 kecamatan yang ekstrem jadi
+        # nyaris 100/100/100/0 vs 0/0/0/100 -- bentuknya "runcing" dan kurang
+        # informatif. Diganti dengan "luas_km2" (data riil & independen, tidak
+        # diturunkan dari rumus kita) supaya bentuk radar lebih bervariasi dan
+        # benar-benar mencerminkan 4 dimensi yang berbeda.
         metrik_radar = ["total_penduduk", "luas_km2", "proporsi_pemuda_dari_total", "rasio_ketergantungan"]
         label_radar = ["Total Penduduk", "Luas Wilayah", "Proporsi Pemuda", "Rasio Ketergantungan"]
         min_vals = df[metrik_radar].min()
@@ -648,6 +788,103 @@ with tab4:
                 f"📌 **{kec_b}** memiliki proporsi pemuda {abs(selisih_pemuda):.1f}% lebih tinggi dibanding "
                 f"**{kec_a}** -- bisa jadi acuan praktik baik yang mungkin relevan diterapkan di {kec_a}."
             )
+with tab5:
+    st.subheader("🔮 Simulasi Proyeksi Pemuda (What-If)")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        kecamatan_pilihan = st.selectbox(
+            "Pilih kecamatan:",
+            ["Se-Kabupaten (semua kecamatan)"] + sorted(df["kecamatan"].tolist()),
+            help="Pilih cakupan simulasi: seluruh kabupaten atau satu kecamatan."
+        )
+
+    with col2:
+        tingkat_pertumbuhan = st.slider(
+            "Asumsi pertumbuhan penduduk/tahun (%):",
+            min_value=-2.0, max_value=5.0, value=1.2, step=0.1,
+            help="Nilai negatif = penduduk menyusut (misalnya karena migrasi keluar). Nilai positif = penduduk bertambah."
+        )
+
+    with col3:
+        jumlah_tahun = st.slider("Proyeksi berapa tahun ke depan?", min_value=1, max_value=25, value=10,
+                                 help="Rentang waktu simulasi, dari 1 sampai 25 tahun.")
+
+    if kecamatan_pilihan == "Se-Kabupaten (semua kecamatan)":
+        populasi_awal = df["total_penduduk"].sum()
+        pemuda_awal = df["pemuda_16_30"].sum()
+    else:
+        baris = df[df["kecamatan"] == kecamatan_pilihan].iloc[0]
+        populasi_awal = baris["total_penduduk"]
+        pemuda_awal = baris["pemuda_16_30"]
+
+    tahun_list = list(range(0, jumlah_tahun + 1))
+    proyeksi_list = []
+    for tahun in tahun_list:
+        faktor = (1 + tingkat_pertumbuhan / 100) ** tahun
+        proyeksi_list.append({
+            "tahun": tahun,
+            "populasi": populasi_awal * faktor,
+            "pemuda": pemuda_awal * faktor,
+        })
+    df_proyeksi = pd.DataFrame(proyeksi_list)
+
+    fig = px.line(
+        df_proyeksi, x="tahun", y=["populasi", "pemuda"],
+        labels={"value": "Jumlah penduduk", "tahun": "Tahun ke depan", "variable": "Kategori"},
+        color_discrete_sequence=[PALET["teal"], PALET["amber"]],
+        markers=True,
+    )
+    fig.update_layout(height=450)
+    st.plotly_chart(fig, width='stretch')
+
+    populasi_akhir = df_proyeksi.iloc[-1]["populasi"]
+    pemuda_akhir = df_proyeksi.iloc[-1]["pemuda"]
+    persen_perubahan_pemuda = (pemuda_akhir - pemuda_awal) / pemuda_awal * 100
+    magnitudo = abs(persen_perubahan_pemuda)
+    naik = persen_perubahan_pemuda >= 0
+
+    info_dasar = (
+        f"populasi pemuda di **{kecamatan_pilihan}** diproyeksikan dari sekitar "
+        f"**{format_id(pemuda_awal)}** menjadi **{format_id(pemuda_akhir)} jiwa** "
+        f"dalam {jumlah_tahun} tahun (asumsi pertumbuhan {tingkat_pertumbuhan}%/tahun)"
+    )
+
+    if magnitudo < 3:
+        if naik:
+            pesan = f"Relatif stabil -- {info_dasar}, naik tipis {persen_perubahan_pemuda:.1f}%. Belum ada tekanan berarti terhadap kebutuhan fasilitas pemuda dalam skenario ini."
+        else:
+            pesan = f"Relatif stabil -- {info_dasar}, turun tipis {magnitudo:.1f}%. Perubahan masih dalam rentang wajar, belum mengindikasikan tren migrasi keluar yang signifikan."
+    elif magnitudo < 15:
+        if naik:
+            pesan = f"Tumbuh cukup nyata -- {info_dasar} (+{persen_perubahan_pemuda:.1f}%). Perlu mulai dipikirkan penambahan kapasitas lapangan kerja dan ruang aktivitas pemuda secara bertahap."
+        else:
+            pesan = f"Menurun cukup nyata -- {info_dasar} ({persen_perubahan_pemuda:.1f}%). Pola ini layak dicermati sebagai kemungkinan awal tren migrasi keluar pemuda."
+    else:
+        if naik:
+            pesan = f"Melonjak signifikan -- {info_dasar} (+{persen_perubahan_pemuda:.1f}%). Lonjakan sebesar ini perlu direspons dengan perencanaan serius: perluasan lapangan kerja, pelatihan keterampilan, dan fasilitas publik untuk pemuda."
+        else:
+            pesan = f"Menyusut tajam -- {info_dasar} ({persen_perubahan_pemuda:.1f}%). Penyusutan setajam ini mengindikasikan potensi migrasi keluar pemuda yang serius dan perlu ditindaklanjuti dengan kajian lebih lanjut."
+
+    if naik:
+        st.success(f"📌 {pesan}")
+    else:
+        st.warning(f"📌 {pesan}")
+
+    st.caption(
+        "⚠️ Proyeksi ini adalah simulasi sederhana berbasis asumsi pertumbuhan linear "
+        "(compound growth), bukan model demografi penuh -- belum memperhitungkan "
+        "migrasi, mortalitas, atau fertilitas secara terpisah."
+    )
+
+    # --- Tabel detail (SEKARANG DI DALAM tab5, bukan bocor ke semua tab) ---
+    with st.expander("🔍 Lihat tabel proyeksi per tahun (untuk validasi)"):
+        tabel = df_proyeksi.copy()
+        tabel["populasi"] = tabel["populasi"].round(0).astype(int)
+        tabel["pemuda"] = tabel["pemuda"].round(0).astype(int)
+        st.dataframe(tabel, width='stretch', hide_index=True)
+
 
 st.markdown("---")
 st.caption(
