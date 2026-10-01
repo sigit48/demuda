@@ -106,9 +106,23 @@ P_PRODUKTIF_KAB = 0.674702
 P_LANSIA_KAB = 0.123679
 PEMUDA_DARI_PRODUKTIF = 0.216137 / 0.674702
 
+# Total penduduk Kabupaten Purworejo, sumber BPS Kab. Purworejo:
+# - 2020, 2022, 2023(=2024): tabel "Jumlah Penduduk ... Menurut Kecamatan" edisi tiap tahun
+#   (dalam jiwa). File edisi 2024 identik dengan edisi 2023, sehingga digabung "2023-2024".
+# - 2021: Tabel 12.1.b "Jumlah Penduduk Berdasarkan Kecamatan ... 2020-2023" (jumlah 16 kecamatan).
+# - 2025 & 2026: tabel edisi 2025/2026, dipublikasikan dalam ribu jiwa (1 desimal),
+#   sehingga dikonversi ke jiwa dengan pembulatan ke ratusan.
 DATA_HISTORIS_KABUPATEN = {
-    "tahun": [2019, 2020, 2021, 2022, 2023, 2024],
-    "penduduk": [714816, 769880, 799411, 804335, 807790, 795033],
+    "tahun": ["2020", "2021", "2022", "2023-2024", "2025", "2026"],
+    "penduduk": [769880, 799411, 778257, 788265, 801700, 808200],
+    "sumber": [
+        "Tabel kecamatan edisi 2020",
+        "Tabel 12.1.b (data 2021)",
+        "Tabel kecamatan edisi 2022",
+        "Tabel kecamatan edisi 2023 & 2024 (identik)",
+        "Tabel kecamatan edisi 2025 (dalam ribu)",
+        "Tabel kecamatan edisi 2026 (dalam ribu)",
+    ],
 }
 
 DATA_STRUKTUR_UMUR_HISTORIS = [
@@ -166,7 +180,7 @@ with st.expander("📖 Cara Menggunakan Aplikasi (klik untuk membuka panduan)"):
     st.markdown(textwrap.dedent("""
     1. **Baca Ringkasan Eksekutif** (kotak hijau di bawah panduan ini) untuk
        gambaran besar kondisi pemuda Kabupaten Purworejo.
-    2. **Buka tab** di bagian tengah halaman. Ada 5 tab, tiap tab menjawab
+    2. **Buka tab** di bagian tengah halaman. Ada 4 tab, tiap tab menjawab
        pertanyaan yang berbeda (lihat tabel di bawah).
     3. **Berinteraksi dengan grafik dan peta**: arahkan kursor, klik, atau pilih
        kecamatan dari menu.
@@ -178,11 +192,10 @@ with st.expander("📖 Cara Menggunakan Aplikasi (klik untuk membuka panduan)"):
     st.markdown(textwrap.dedent("""
     | Tab | Pertanyaan yang dijawab | Cara pakai |
     |---|---|---|
-    | 📊 **Ringkasan Kabupaten** | Bagaimana struktur usia dan tren penduduk Purworejo? | Lihat 4 angka utama, lalu gulir ke bawah untuk grafik struktur usia dan tren 2019-2026. |
+    | 📊 **Ringkasan Kabupaten** | Bagaimana struktur usia dan tren penduduk Purworejo? | Lihat 4 angka utama, lalu gulir ke bawah untuk grafik struktur usia dan tren penduduk 2020-2026. |
     | 🗺️ **Peta & Profil Kecamatan** | Di mana penduduk dan pemuda terkonsentrasi? | Pilih metrik pada menu, lalu **klik titik** kecamatan di peta untuk melihat kartu detailnya. Tabel profil lengkap ada di bagian bawah. |
     | 🧑‍🤝‍🧑 **Fokus Pemuda** | Kecamatan mana yang proporsi pemudanya tertinggi/terendah? | Baca grafik ranking dan *Insight Otomatis* di bawahnya. |
     | ⚖️ **Bandingkan Kecamatan** | Bagaimana dua kecamatan dibandingkan? | Pilih **dua kecamatan berbeda** pada dua menu, lalu lihat angka berdampingan dan grafik radar. |
-    | 🔮 **Simulasi Proyeksi** | Bagaimana jumlah pemuda 5-25 tahun ke depan? | Pilih kecamatan, geser **slider pertumbuhan** dan **jumlah tahun**. Grafik dan kesimpulan berubah otomatis. |
     """))
 
     st.markdown("##### 🖱️ Tips berinteraksi dengan grafik")
@@ -199,8 +212,8 @@ with st.expander("📖 Cara Menggunakan Aplikasi (klik untuk membuka panduan)"):
     st.markdown(textwrap.dedent("""
     - *"Kecamatan mana yang diprioritaskan untuk pelatihan wirausaha muda?"*
       → Tab **Fokus Pemuda**, lihat kecamatan dengan proporsi pemuda tertinggi.
-    - *"Apakah pemuda di kecamatan saya berkurang dalam 10 tahun?"*
-      → Tab **Simulasi Proyeksi**, pilih kecamatan, atur pertumbuhan penduduk, baca kesimpulan.
+    - *"Apakah penduduk Purworejo bertambah dalam beberapa tahun terakhir?"*
+      → Tab **Ringkasan Kabupaten**, lihat grafik Tren Penduduk 2020-2026.
     - *"Kenapa kecamatan A dan B berbeda?"*
       → Tab **Bandingkan Kecamatan**, lihat radar dan selisih proporsi pemuda.
     """))
@@ -217,7 +230,7 @@ with st.sidebar:
     with st.expander("🚀 Panduan Cepat", expanded=True):
         st.markdown(textwrap.dedent("""
         1. Baca **Ringkasan Eksekutif**.
-        2. Pilih salah satu dari **5 tab**.
+        2. Pilih salah satu dari **4 tab**.
         3. **Klik peta** atau **pilih kecamatan** untuk detail.
         4. **Unduh laporan** (.txt / .pdf).
 
@@ -245,8 +258,8 @@ with st.sidebar:
         **Estimasi**: angka hasil perhitungan berbasis data resmi, bukan hasil
         sensus langsung.
 
-        **Proyeksi (compound growth)**: perhitungan pertumbuhan berbunga dengan
-        laju tetap per tahun.
+        **Laju pertumbuhan rata-rata per tahun**: kenaikan penduduk rata-rata
+        tiap tahun, dihitung secara geometrik dari tahun awal ke tahun akhir.
         """))
 
     with st.expander("❓ Tanya Jawab (FAQ)"):
@@ -267,10 +280,9 @@ with st.sidebar:
         Pastikan browser tidak memblokir unduhan. Alternatifnya gunakan
         tombol Unduh .txt.
 
-        **Apakah hasil simulasi adalah ramalan pasti?**
-        Bukan. Simulasi hanya menghitung "bagaimana jika" berdasarkan asumsi
-        pertumbuhan yang Anda pilih, tanpa memperhitungkan migrasi,
-        kelahiran, dan kematian secara terpisah.
+        **Mengapa grafik tren penduduk ada titik "2023-2024"?**
+        File BPS edisi 2023 dan 2024 berisi angka yang sama persis, sehingga
+        digabung menjadi satu titik agar tidak terkesan penduduk berhenti tumbuh.
 
         **Bagaimana mengembalikan pilihan ke awal?**
         Muat ulang halaman (F5). Semua menu kembali ke nilai bawaan.
@@ -296,6 +308,11 @@ with st.expander("ℹ️ Metodologi & Sumber Data"):
     sumber konsisten untuk seluruh rentang tahun, sehingga tren rasio
     ketergantungan & proporsi pemuda dari tahun ke tahun bisa dibandingkan
     langsung tanpa perlu estimasi tambahan.
+
+    Untuk grafik "Tren Penduduk Kabupaten" (2020-2026), digunakan total
+    penduduk dari tabel BPS "Jumlah Penduduk menurut Kecamatan" edisi 2020,
+    2022, 2023/2024, 2025, dan 2026, serta data tahun 2021 dari Tabel 12.1.b
+    (jumlah 16 kecamatan). Detail catatan data ada di bawah grafik tersebut.
 
     Karena BPS tidak mempublikasikan breakdown umur *per kecamatan* secara
     terbuka, breakdown umur tiap kecamatan pada dashboard ini adalah
@@ -482,7 +499,6 @@ tab1, tab2, tab3, tab4 = st.tabs([
     "🗺️ Peta & Profil Kecamatan",
     "🧑‍🤝‍🧑 Fokus Pemuda",
     "⚖️ Bandingkan Kecamatan",
-    # "🔮 Simulasi Proyeksi"
 ])
 with tab1:
     c1, c2, c3, c4 = st.columns(4)
@@ -517,19 +533,36 @@ with tab1:
     )
 
     st.markdown("---")
-    st.subheader("📈 Tren Penduduk Kabupaten (2019-2024)")
+    st.subheader("📈 Tren Penduduk Kabupaten (2020-2026)")
     df_historis = pd.DataFrame(DATA_HISTORIS_KABUPATEN)
     fig_historis = px.line(
         df_historis, x="tahun", y="penduduk", markers=True,
-        labels={"tahun": "Tahun", "penduduk": "Jumlah Penduduk"},
+        labels={"tahun": "Tahun", "penduduk": "Jumlah Penduduk", "sumber": "Sumber"},
+        hover_data={"sumber": True},
         color_discrete_sequence=[PALET["teal"]]
     )
+    fig_historis.update_xaxes(type="category")
     fig_historis.update_layout(height=320)
     st.plotly_chart(fig_historis, width='stretch')
+
+    penduduk_awal_tren = df_historis.iloc[0]["penduduk"]
+    penduduk_akhir_tren = df_historis.iloc[-1]["penduduk"]
+    tambahan_tren = penduduk_akhir_tren - penduduk_awal_tren
+    laju_tren = ((penduduk_akhir_tren / penduduk_awal_tren) ** (1 / 6) - 1) * 100
+    st.info(
+        f"📌 **Insight otomatis:** Dari 2020 ke 2026 penduduk Kabupaten Purworejo bertambah sekitar "
+        f"**{format_id(tambahan_tren)} jiwa** ({tambahan_tren / penduduk_awal_tren * 100:.1f}%), "
+        f"atau rata-rata **{laju_tren:.2f}% per tahun**. Laju ini dihitung dari titik awal dan akhir "
+        f"saja (2020 dan 2026), yang berasal dari seri data BPS yang sama."
+    )
     st.caption(
-        "Sumber: data total kabupaten dari laporan yang mengutip BPS Kab. Purworejo. "
-        "Penurunan 2023→2024 mencerminkan kalibrasi ulang proyeksi BPS mengikuti data "
-        "sensus terbaru, bukan penurunan penduduk riil."
+        "Sumber: BPS Kabupaten Purworejo -- tabel \"Jumlah Penduduk menurut Kecamatan\" edisi 2020, 2022, "
+        "2023, 2024, 2025, 2026, dan Tabel 12.1.b (hanya data tahun 2021). "
+        "Catatan: (1) edisi 2023 dan 2024 berisi angka identik, sehingga digabung menjadi satu titik; "
+        "(2) angka 2025 dan 2026 dipublikasikan BPS dalam ribuan, sehingga dibulatkan ke ratusan; "
+        "(3) data 2021 berasal dari tabel yang berbeda dengan tahun lain, sehingga lonjakan 2021 lalu "
+        "penurunan 2022 sebagian mencerminkan perbedaan basis penghitungan antar tabel, bukan perubahan "
+        "penduduk riil."
     )
 
     st.markdown("---")
