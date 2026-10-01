@@ -106,22 +106,24 @@ P_PRODUKTIF_KAB = 0.674702
 P_LANSIA_KAB = 0.123679
 PEMUDA_DARI_PRODUKTIF = 0.216137 / 0.674702
 
-# Total penduduk Kabupaten Purworejo, sumber BPS Kab. Purworejo:
-# - 2020, 2022, 2023(=2024): tabel "Jumlah Penduduk ... Menurut Kecamatan" edisi tiap tahun
-#   (dalam jiwa). File edisi 2024 identik dengan edisi 2023, sehingga digabung "2023-2024".
-# - 2021: Tabel 12.1.b "Jumlah Penduduk Berdasarkan Kecamatan ... 2020-2023" (jumlah 16 kecamatan).
-# - 2025 & 2026: tabel edisi 2025/2026, dipublikasikan dalam ribu jiwa (1 desimal),
-#   sehingga dikonversi ke jiwa dengan pembulatan ke ratusan.
+# Total penduduk Kabupaten Purworejo:
+# - 2020, 2022, 2023(=2024): BPS Kab. Purworejo, tabel "Jumlah Penduduk ... Menurut Kecamatan"
+#   edisi tiap tahun. File edisi 2024 identik dengan edisi 2023, sehingga digabung "2023-2024".
+# - 2021: Open Data Kabupaten Purworejo, Tabel 12.1.b (jumlah 16 kecamatan, hanya kolom 2021);
+#   data 2021 tidak tersedia di situs BPS Kab. Purworejo.
+# - 2025 & 2026: total dari tabel "Jumlah Penduduk Menurut Kelompok Umur dan Jenis Kelamin"
+#   BPS edisi 2025 dan 2026 (801.670 dan 808.153), konsisten dengan tabel kecamatan
+#   (801,7 ribu dan 808,2 ribu).
 DATA_HISTORIS_KABUPATEN = {
     "tahun": ["2020", "2021", "2022", "2023-2024", "2025", "2026"],
-    "penduduk": [769880, 799411, 778257, 788265, 801700, 808200],
+    "penduduk": [769880, 799411, 778257, 788265, 801670, 808153],
     "sumber": [
         "Tabel kecamatan edisi 2020",
-        "Tabel 12.1.b (data 2021)",
+        "Open Data Purworejo, Tabel 12.1.b",
         "Tabel kecamatan edisi 2022",
         "Tabel kecamatan edisi 2023 & 2024 (identik)",
-        "Tabel kecamatan edisi 2025 (dalam ribu)",
-        "Tabel kecamatan edisi 2026 (dalam ribu)",
+        "BPS, tabel kelompok umur edisi 2025",
+        "BPS, tabel kelompok umur edisi 2026",
     ],
 }
 
@@ -310,9 +312,11 @@ with st.expander("ℹ️ Metodologi & Sumber Data"):
     langsung tanpa perlu estimasi tambahan.
 
     Untuk grafik "Tren Penduduk Kabupaten" (2020-2026), digunakan total
-    penduduk dari tabel BPS "Jumlah Penduduk menurut Kecamatan" edisi 2020,
-    2022, 2023/2024, 2025, dan 2026, serta data tahun 2021 dari Tabel 12.1.b
-    (jumlah 16 kecamatan). Detail catatan data ada di bawah grafik tersebut.
+    penduduk dari BPS Kab. Purworejo (tabel "Jumlah Penduduk menurut Kecamatan"
+    edisi 2020, 2022, 2023/2024, serta tabel kelompok umur edisi 2025 dan 2026),
+    ditambah data tahun 2021 dari Open Data Kabupaten Purworejo (Tabel 12.1.b),
+    karena data 2021 tidak tersedia di situs BPS. Detail catatan data ada di
+    bawah grafik tersebut.
 
     Karena BPS tidak mempublikasikan breakdown umur *per kecamatan* secara
     terbuka, breakdown umur tiap kecamatan pada dashboard ini adalah
@@ -556,13 +560,13 @@ with tab1:
         f"saja (2020 dan 2026), yang berasal dari seri data BPS yang sama."
     )
     st.caption(
-        "Sumber: BPS Kabupaten Purworejo -- tabel \"Jumlah Penduduk menurut Kecamatan\" edisi 2020, 2022, "
-        "2023, 2024, 2025, 2026, dan Tabel 12.1.b (hanya data tahun 2021). "
+        "Sumber: BPS Kabupaten Purworejo (tabel \"Jumlah Penduduk menurut Kecamatan\" edisi 2020, 2022, "
+        "2023-2024, dan tabel kelompok umur edisi 2025-2026) serta Open Data Kabupaten Purworejo "
+        "(Tabel 12.1.b, hanya data tahun 2021, karena data 2021 tidak tersedia di situs BPS). "
         "Catatan: (1) edisi 2023 dan 2024 berisi angka identik, sehingga digabung menjadi satu titik; "
-        "(2) angka 2025 dan 2026 dipublikasikan BPS dalam ribuan, sehingga dibulatkan ke ratusan; "
-        "(3) data 2021 berasal dari tabel yang berbeda dengan tahun lain, sehingga lonjakan 2021 lalu "
-        "penurunan 2022 sebagian mencerminkan perbedaan basis penghitungan antar tabel, bukan perubahan "
-        "penduduk riil."
+        "(2) data 2021 berasal dari portal dan tabel yang berbeda dengan tahun lain, sehingga lonjakan 2021 "
+        "lalu penurunan 2022 sebagian mencerminkan perbedaan basis penghitungan antar tabel, bukan "
+        "perubahan penduduk riil."
     )
 
     st.markdown("---")
