@@ -139,6 +139,7 @@ DATA_STRUKTUR_UMUR_HISTORIS = [
 @st.cache_data
 def load_data():
     df = pd.DataFrame(DATA_DASAR_KECAMATAN, columns=["kecamatan", "lat", "lon", "total_penduduk", "luas_km2"])
+    df["total_penduduk"] = (df["total_penduduk"] * (808153 / ["total_penduduk"].sum())).round().astype(int)
     df["kepadatan"] = df["total_penduduk"] / df["luas_km2"]
     kepadatan_rata2_kab = df["total_penduduk"].sum() / df["luas_km2"].sum()
     z = (df["kepadatan"] / kepadatan_rata2_kab) - 1
