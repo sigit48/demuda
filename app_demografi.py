@@ -82,23 +82,28 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# Populasi per kecamatan: BPS Kab. Purworejo, tabel "Jumlah Penduduk menurut Kecamatan" edisi 2026
+# (dipublikasikan dalam ribu jiwa, 1 desimal). Agar jumlah 16 kecamatan sama persis dengan total
+# kabupaten 2026 (808.153, dari tabel kelompok umur BPS 2026), angka tiap kecamatan diskalakan
+# proporsional lalu dibulatkan (selisih per kecamatan hanya 6-17 jiwa dari angka publikasi).
+# Luas wilayah (km2) dan koordinat tidak berubah.
 DATA_DASAR_KECAMATAN = [
-    ("Bagelen",      -7.81128,  110.04006,    31476,          63.44),
-    ("Banyuurip",    -7.75608,  109.97645,    44951,          47.78),
-    ("Bayan",        -7.71026,  109.94889,    54098,          44.66),
-    ("Bener",        -7.6386,   110.0518,     59885,         102.44),
-    ("Bruno",        -7.53,     109.87,       56370,         105.68),
-    ("Butuh",        -7.725155, 109.8570219,  43707,          47.21),
-    ("Gebang",       -7.64245,  109.99269,    45260,          70.51),
-    ("Grabag",       -7.81093,  109.87967,    52020,          67.80),
-    ("Kaligesing",   -7.7347,   110.0799,     33101,          78.33),
-    ("Kemiri",       -7.64786,  109.90438,    62015,         103.15),
-    ("Kutoarjo",     -7.71700,  109.91480,    64214,          39.20),
-    ("Loano",        -7.6653,   110.1015,     39847,          53.51),
-    ("Ngombol",      -7.8254,   109.9661,     36799,          59.33),
-    ("Pituruh",      -7.6414,   109.83652,    53971,          89.01),
-    ("Purwodadi",    -7.8657,   110.0024,     43430,          56.15),
-    ("Purworejo",    -7.72232,  110.03042,    87009,          53.25),
+    ("Bagelen",      -7.81128,  110.04006,    32006,          63.44),
+    ("Banyuurip",    -7.75608,  109.97645,    45409,          47.78),
+    ("Bayan",        -7.71026,  109.94889,    53810,          44.66),
+    ("Bener",        -7.6386,   110.0518,     58911,         102.44),
+    ("Bruno",        -7.53,     109.87,       54610,         105.68),
+    ("Butuh",        -7.725155, 109.8570219,  44108,          47.21),
+    ("Gebang",       -7.64245,  109.99269,    45609,          70.51),
+    ("Grabag",       -7.81093,  109.87967,    51310,          67.80),
+    ("Kaligesing",   -7.7347,   110.0799,     33306,          78.33),
+    ("Kemiri",       -7.64786,  109.90438,    61112,         103.15),
+    ("Kutoarjo",     -7.71700,  109.91480,    65212,          39.20),
+    ("Loano",        -7.6653,   110.1015,     39908,          53.51),
+    ("Ngombol",      -7.8254,   109.9661,     36507,          59.33),
+    ("Pituruh",      -7.6414,   109.83652,    53710,          89.01),
+    ("Purwodadi",    -7.8657,   110.0024,     43108,          56.15),
+    ("Purworejo",    -7.72232,  110.03042,    89517,          53.25),
 ]
 
 P_ANAK_KAB = 0.201677
@@ -301,8 +306,11 @@ with st.expander("ℹ️ Metodologi & Sumber Data"):
        Kelompok Umur dan Jenis Kelamin di Kabupaten Purworejo, 2026"* (level
        kabupaten, agregat, tidak dipecah per kecamatan).
     2. **Populasi & luas wilayah per kecamatan** -- BPS Kab. Purworejo,
-       *"Kabupaten Purworejo Dalam Angka 2025"* (estimasi pertengahan 2024,
-       per kecamatan, tanpa breakdown umur).
+       *"Jumlah Penduduk menurut Kecamatan di Kabupaten Purworejo, 2026"*
+       (per kecamatan dalam ribu jiwa, tanpa breakdown umur). Agar jumlah 16
+       kecamatan sama dengan total kabupaten 2026 (808.153), angka tiap
+       kecamatan diskalakan proporsional dengan selisih hanya 6-17 jiwa.
+       Luas wilayah per kecamatan bersumber dari BPS.
 
     Untuk grafik "Tren Struktur Umur Kabupaten" di Tab Ringkasan, digunakan
     **4 edisi tambahan** dari sumber yang sama (BPS, *"Jumlah Penduduk
@@ -383,7 +391,7 @@ rata_rata_proporsi = ranking["proporsi_pemuda_dari_total"].mean()
 jumlah_di_atas_rata2 = int((ranking["proporsi_pemuda_dari_total"] > rata_rata_proporsi).sum())
 
 ringkasan_teks = (
-    f"Kabupaten Purworejo memiliki **{format_id(total_penduduk)}** penduduk (estimasi terkini), dengan "
+    f"Kabupaten Purworejo memiliki **{format_id(total_penduduk)}** penduduk (data BPS 2026), dengan "
     f"**{format_id(total_produktif)}** jiwa usia produktif dan **{format_id(total_pemuda)}** jiwa pemuda (15-29 tahun). "
     f"Rasio ketergantungan kabupaten sebesar **{rasio_ketergantungan_kab}%**. "
     f"Kecamatan **{tertinggi['kecamatan']}** memiliki proporsi pemuda tertinggi "
@@ -421,7 +429,7 @@ RANKING PROPORSI PEMUDA PER KECAMATAN (tertinggi ke terendah)
 
 ==========================================================
 Sumber data: BPS Kabupaten Purworejo (struktur umur kabupaten 2026 +
-populasi per kecamatan, Purworejo Dalam Angka 2025). Breakdown umur per
+populasi per kecamatan 2026). Breakdown umur per
 kecamatan merupakan estimasi berbasis kepadatan penduduk -- lihat
 metodologi lengkap di aplikasi.
 Dibuat untuk Lomba Teknologi Piranti Lunak -- Jambore Pemuda Purworejo 2026.
@@ -831,5 +839,5 @@ st.markdown("---")
 st.caption(
     "Dibuat untuk Lomba Teknologi Piranti Lunak -- Jambore Pemuda Tingkat "
     "Kabupaten Purworejo 2026. Sumber data: BPS Kabupaten Purworejo "
-    "(struktur umur kabupaten 2026 + populasi per kecamatan, Purworejo Dalam Angka 2025)."
+    "(struktur umur kabupaten 2026 + populasi per kecamatan 2026)."
 )
