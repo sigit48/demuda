@@ -14,7 +14,7 @@ Peta file (lihat juga PETA_KODE.md):
 
 import streamlit as st
 
-from demuda import bantuan, laporan, tab_bandingkan, tab_pemuda, tab_peta, tab_ringkasan
+from demuda import bantuan, laporan, tab_bandingkan, tab_pemuda, tab_peta, tab_ringkasan, tab_simulasi 
 from demuda.data import load_data
 from demuda.gaya import css_global, html_header, html_ringkasan_eksekutif
 from demuda.hitung import hitung_ringkasan, markdown_bold_ke_html
@@ -48,11 +48,12 @@ st.markdown(html_ringkasan_eksekutif(markdown_bold_ke_html(r.ringkasan_teks)), u
 laporan.tampilkan_tombol_unduh(r)
 
 # --- Tab ---
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📊 Ringkasan Kabupaten",
     "🗺️ Peta & Profil Kecamatan",
     "🧑‍🤝‍🧑 Fokus Pemuda",
     "⚖️ Bandingkan Kecamatan",
+    "🔮 Simulasi Proyeksi",
 ])
 with tab1:
     tab_ringkasan.tampilkan(df, r)
@@ -62,8 +63,9 @@ with tab3:
     tab_pemuda.tampilkan(df, r)
 with tab4:
     tab_bandingkan.tampilkan(df, r)
-# Tab 5 (Simulasi Proyeksi) ditambahkan di lokasi lomba: buat demuda/tab_simulasi.py,
-# tambahkan nama tab pada st.tabs di atas, lalu panggil tab_simulasi.tampilkan(df, r).
+with tab5:
+    tab_simulasi.tampilkan(df, r)
+
 
 
 st.markdown("---")
