@@ -1,20 +1,6 @@
-"""DEMUDA Purworejo -- pintu masuk aplikasi.
-
-Jalankan:  streamlit run app_demografi.py
-
-Peta file (lihat juga PETA_KODE.md):
-  demuda/konfigurasi.py  warna dan logo
-  demuda/gaya.py         semua HTML dan CSS
-  demuda/data.py         data BPS dan rumus estimasi (load_data)
-  demuda/hitung.py       rumus ringkasan, tren, radar
-  demuda/bantuan.py      panduan, sidebar, metodologi
-  demuda/laporan.py      laporan TXT dan PDF
-  demuda/tab_*.py        isi tiap tab
-"""
-
 import streamlit as st
 
-from demuda import bantuan, laporan, tab_bandingkan, tab_pemuda, tab_peta, tab_ringkasan, tab_simulasi 
+from demuda import bantuan, laporan, tab_bandingkan, tab_pemuda, tab_peta, tab_ringkasan
 from demuda.data import load_data
 from demuda.gaya import css_global, html_header, html_ringkasan_eksekutif
 from demuda.hitung import hitung_ringkasan, markdown_bold_ke_html
@@ -48,12 +34,12 @@ st.markdown(html_ringkasan_eksekutif(markdown_bold_ke_html(r.ringkasan_teks)), u
 laporan.tampilkan_tombol_unduh(r)
 
 # --- Tab ---
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4 = st.tabs([
     "📊 Ringkasan Kabupaten",
     "🗺️ Peta & Profil Kecamatan",
     "🧑‍🤝‍🧑 Fokus Pemuda",
     "⚖️ Bandingkan Kecamatan",
-    "🔮 Simulasi Proyeksi",
+    # "🔮 Simulasi Proyeksi",
 ])
 with tab1:
     tab_ringkasan.tampilkan(df, r)
@@ -63,8 +49,6 @@ with tab3:
     tab_pemuda.tampilkan(df, r)
 with tab4:
     tab_bandingkan.tampilkan(df, r)
-with tab5:
-    tab_simulasi.tampilkan(df, r)
 
 
 
