@@ -1,11 +1,3 @@
-"""Data mentah dan rumus estimasi struktur umur per kecamatan.
-
-- DATA_DASAR_KECAMATAN : penduduk, luas, koordinat (BPS)
-- DATA_HISTORIS_KABUPATEN, DATA_STRUKTUR_UMUR_HISTORIS : data tren
-- load_data() : RUMUS estimasi (penyesuaian kepadatan, batas +-40%)
-
-Untuk memperbarui data tahun depan, cukup ubah angka di file ini.
-"""
 
 import pandas as pd
 import streamlit as st
