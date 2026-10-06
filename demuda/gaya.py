@@ -48,7 +48,7 @@ h1, h2, h3, .stTabs [data-baseweb="tab"] p {{
 
 def html_header():
     """Logo + judul aplikasi di bagian atas."""
-    return f"""
+    return f"""<div style='display:flex;align-items:center;gap:18px;margin-bottom:4px'>
 {LOGO_SVG}
 <div>
 <h1 style='margin:0;line-height:1.1;'>DEMUDA Purworejo</h1>
