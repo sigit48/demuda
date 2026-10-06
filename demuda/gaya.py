@@ -10,7 +10,7 @@ from .hitung import format_id
 
 def css_global():
     """CSS tema: font, kartu metrik, warna tab."""
-    return f"""
+    return f"""<div style='display:flex;align-items:center;gap:18px;margin-bottom:4px;'>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700&family=Inter:wght@400;500&display=swap');
 
