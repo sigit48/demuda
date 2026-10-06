@@ -10,11 +10,7 @@ Untuk memperbarui data tahun depan, cukup ubah angka di file ini.
 import pandas as pd
 import streamlit as st
 
-# Populasi per kecamatan: BPS Kab. Purworejo, tabel "Jumlah Penduduk menurut Kecamatan" edisi 2026
-# (dipublikasikan dalam ribu jiwa, 1 desimal). Agar jumlah 16 kecamatan sama persis dengan total
-# kabupaten 2026 (808.153, dari tabel kelompok umur BPS 2026), angka tiap kecamatan diskalakan
-# proporsional lalu dibulatkan (selisih per kecamatan hanya 6-17 jiwa dari angka publikasi).
-# Luas wilayah (km2) dan koordinat tidak berubah.
+
 DATA_DASAR_KECAMATAN = [
     ("Bagelen",      -7.81128,  110.04006,    32006,          63.44),
     ("Banyuurip",    -7.75608,  109.97645,    45409,          47.78),
@@ -39,14 +35,7 @@ P_PRODUKTIF_KAB = 0.674702
 P_LANSIA_KAB = 0.123679
 PEMUDA_DARI_PRODUKTIF = 0.216137 / 0.674702
 
-# Total penduduk Kabupaten Purworejo:
-# - 2020, 2022, 2023(=2024): BPS Kab. Purworejo, tabel "Jumlah Penduduk ... Menurut Kecamatan"
-#   edisi tiap tahun. File edisi 2024 identik dengan edisi 2023, sehingga digabung "2023-2024".
-# - 2021: Open Data Kabupaten Purworejo, Tabel 12.1.b (jumlah 16 kecamatan, hanya kolom 2021);
-#   data 2021 tidak tersedia di situs BPS Kab. Purworejo.
-# - 2025 & 2026: total dari tabel "Jumlah Penduduk Menurut Kelompok Umur dan Jenis Kelamin"
-#   BPS edisi 2025 dan 2026 (801.670 dan 808.153), konsisten dengan tabel kecamatan
-#   (801,7 ribu dan 808,2 ribu).
+
 DATA_HISTORIS_KABUPATEN = {
     "tahun": ["2020", "2021", "2022", "2023-2024", "2025", "2026"],
     "penduduk": [769880, 799411, 778257, 788265, 801670, 808153],
